@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detection.maskrcnn_benchmark package &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Detection.maskrcnn_benchmark.config package" href="Detection.maskrcnn_benchmark.config.html" />
+    <link rel="prev" title="Detection package" href="Detection.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">horseracing-v2.4</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="Detection.html">Detection package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="Detection.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Detection.maskrcnn_benchmark package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.html#module-Detection">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="GCNClustering.html">GCNClustering package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SceneClassifier.html">SceneClassifier package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Segmentation.html">Segmentation package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tracking.html">Tracking package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">horseracing-v2.4</a></li>
+          <li class="breadcrumb-item"><a href="Detection.html">Detection package</a></li>
+      <li class="breadcrumb-item active">Detection.maskrcnn_benchmark package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Detection.maskrcnn_benchmark.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="detection-maskrcnn-benchmark-package">
+<h1>Detection.maskrcnn_benchmark package<a class="headerlink" href="#detection-maskrcnn-benchmark-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.html">Detection.maskrcnn_benchmark.config package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.defaults.html">Detection.maskrcnn_benchmark.config.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.paths_catalog.html">Detection.maskrcnn_benchmark.config.paths_catalog module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.paths_catalog.html#Detection.maskrcnn_benchmark.config.paths_catalog.DatasetCatalog"><code class="docutils literal notranslate"><span class="pre">DatasetCatalog</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.paths_catalog.html#Detection.maskrcnn_benchmark.config.paths_catalog.ModelCatalog"><code class="docutils literal notranslate"><span class="pre">ModelCatalog</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.config.html#module-Detection.maskrcnn_benchmark.config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.html">Detection.maskrcnn_benchmark.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.datasets.html">Detection.maskrcnn_benchmark.data.datasets package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.datasets.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.datasets.html#module-Detection.maskrcnn_benchmark.data.datasets">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.samplers.html">Detection.maskrcnn_benchmark.data.samplers package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.samplers.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.samplers.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.transforms.html">Detection.maskrcnn_benchmark.data.transforms package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.transforms.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.transforms.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.build.html">Detection.maskrcnn_benchmark.data.build module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.collate_batch.html">Detection.maskrcnn_benchmark.data.collate_batch module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.data.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.html">Detection.maskrcnn_benchmark.engine package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html">Detection.maskrcnn_benchmark.engine.inference module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.COCOResults"><code class="docutils literal notranslate"><span class="pre">COCOResults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.check_expected_results"><code class="docutils literal notranslate"><span class="pre">check_expected_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.compute_on_dataset"><code class="docutils literal notranslate"><span class="pre">compute_on_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.evaluate_box_proposals"><code class="docutils literal notranslate"><span class="pre">evaluate_box_proposals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.evaluate_predictions_on_coco"><code class="docutils literal notranslate"><span class="pre">evaluate_predictions_on_coco()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.inference"><code class="docutils literal notranslate"><span class="pre">inference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.prepare_for_coco_detection"><code class="docutils literal notranslate"><span class="pre">prepare_for_coco_detection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.inference.html#Detection.maskrcnn_benchmark.engine.inference.prepare_for_coco_segmentation"><code class="docutils literal notranslate"><span class="pre">prepare_for_coco_segmentation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.trainer.html">Detection.maskrcnn_benchmark.engine.trainer module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.engine.html#module-Detection.maskrcnn_benchmark.engine">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html">Detection.maskrcnn_benchmark.layers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.batch_norm.html">Detection.maskrcnn_benchmark.layers.batch_norm module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.batch_norm.html#Detection.maskrcnn_benchmark.layers.batch_norm.FrozenBatchNorm2d"><code class="docutils literal notranslate"><span class="pre">FrozenBatchNorm2d</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.l2_loss.html">Detection.maskrcnn_benchmark.layers.l2_loss module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.l2_loss.html#Detection.maskrcnn_benchmark.layers.l2_loss.l2_loss"><code class="docutils literal notranslate"><span class="pre">l2_loss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.misc.html">Detection.maskrcnn_benchmark.layers.misc module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.misc.html#Detection.maskrcnn_benchmark.layers.misc.Conv2d"><code class="docutils literal notranslate"><span class="pre">Conv2d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.misc.html#Detection.maskrcnn_benchmark.layers.misc.ConvTranspose2d"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.misc.html#Detection.maskrcnn_benchmark.layers.misc.interpolate"><code class="docutils literal notranslate"><span class="pre">interpolate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.nms.html">Detection.maskrcnn_benchmark.layers.nms module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.roi_align.html">Detection.maskrcnn_benchmark.layers.roi_align module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.roi_align.html#Detection.maskrcnn_benchmark.layers.roi_align.ROIAlign"><code class="docutils literal notranslate"><span class="pre">ROIAlign</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.roi_align.html#Detection.maskrcnn_benchmark.layers.roi_align.roi_align"><code class="docutils literal notranslate"><span class="pre">roi_align()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.roi_pool.html">Detection.maskrcnn_benchmark.layers.roi_pool module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.roi_pool.html#Detection.maskrcnn_benchmark.layers.roi_pool.ROIPool"><code class="docutils literal notranslate"><span class="pre">ROIPool</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.roi_pool.html#Detection.maskrcnn_benchmark.layers.roi_pool.roi_pool"><code class="docutils literal notranslate"><span class="pre">roi_pool()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.smooth_l1_loss.html">Detection.maskrcnn_benchmark.layers.smooth_l1_loss module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.smooth_l1_loss.html#Detection.maskrcnn_benchmark.layers.smooth_l1_loss.smooth_l1_loss"><code class="docutils literal notranslate"><span class="pre">smooth_l1_loss()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#module-Detection.maskrcnn_benchmark.layers">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d"><code class="docutils literal notranslate"><span class="pre">Conv2d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.bias"><code class="docutils literal notranslate"><span class="pre">Conv2d.bias</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.dilation"><code class="docutils literal notranslate"><span class="pre">Conv2d.dilation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.forward"><code class="docutils literal notranslate"><span class="pre">Conv2d.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.groups"><code class="docutils literal notranslate"><span class="pre">Conv2d.groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.kernel_size"><code class="docutils literal notranslate"><span class="pre">Conv2d.kernel_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.out_channels"><code class="docutils literal notranslate"><span class="pre">Conv2d.out_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.output_padding"><code class="docutils literal notranslate"><span class="pre">Conv2d.output_padding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.padding"><code class="docutils literal notranslate"><span class="pre">Conv2d.padding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.padding_mode"><code class="docutils literal notranslate"><span class="pre">Conv2d.padding_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.stride"><code class="docutils literal notranslate"><span class="pre">Conv2d.stride</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.transposed"><code class="docutils literal notranslate"><span class="pre">Conv2d.transposed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.Conv2d.weight"><code class="docutils literal notranslate"><span class="pre">Conv2d.weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.bias"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.bias</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.dilation"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.dilation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.forward"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.groups"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.kernel_size"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.kernel_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.out_channels"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.out_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.output_padding"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.output_padding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.padding"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.padding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.padding_mode"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.padding_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.stride"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.stride</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.transposed"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.transposed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ConvTranspose2d.weight"><code class="docutils literal notranslate"><span class="pre">ConvTranspose2d.weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.FrozenBatchNorm2d"><code class="docutils literal notranslate"><span class="pre">FrozenBatchNorm2d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.FrozenBatchNorm2d.forward"><code class="docutils literal notranslate"><span class="pre">FrozenBatchNorm2d.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.FrozenBatchNorm2d.training"><code class="docutils literal notranslate"><span class="pre">FrozenBatchNorm2d.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ROIAlign"><code class="docutils literal notranslate"><span class="pre">ROIAlign</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ROIAlign.forward"><code class="docutils literal notranslate"><span class="pre">ROIAlign.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ROIAlign.training"><code class="docutils literal notranslate"><span class="pre">ROIAlign.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ROIPool"><code class="docutils literal notranslate"><span class="pre">ROIPool</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ROIPool.forward"><code class="docutils literal notranslate"><span class="pre">ROIPool.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.ROIPool.training"><code class="docutils literal notranslate"><span class="pre">ROIPool.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.interpolate"><code class="docutils literal notranslate"><span class="pre">interpolate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.l2_loss"><code class="docutils literal notranslate"><span class="pre">l2_loss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.nms"><code class="docutils literal notranslate"><span class="pre">nms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.roi_align"><code class="docutils literal notranslate"><span class="pre">roi_align()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.roi_pool"><code class="docutils literal notranslate"><span class="pre">roi_pool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.smooth_l1_loss"><code class="docutils literal notranslate"><span class="pre">smooth_l1_loss()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.html">Detection.maskrcnn_benchmark.modeling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.backbone.html">Detection.maskrcnn_benchmark.modeling.backbone package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.backbone.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.backbone.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.detector.html">Detection.maskrcnn_benchmark.modeling.detector package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.detector.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.detector.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.roi_heads.html">Detection.maskrcnn_benchmark.modeling.roi_heads package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.roi_heads.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.roi_heads.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.roi_heads.html#module-Detection.maskrcnn_benchmark.modeling.roi_heads">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.rpn.html">Detection.maskrcnn_benchmark.modeling.rpn package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.rpn.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.rpn.html#module-Detection.maskrcnn_benchmark.modeling.rpn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.balanced_positive_negative_sampler.html">Detection.maskrcnn_benchmark.modeling.balanced_positive_negative_sampler module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.balanced_positive_negative_sampler.html#Detection.maskrcnn_benchmark.modeling.balanced_positive_negative_sampler.BalancedPositiveNegativeSampler"><code class="docutils literal notranslate"><span class="pre">BalancedPositiveNegativeSampler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.box_coder.html">Detection.maskrcnn_benchmark.modeling.box_coder module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.box_coder.html#Detection.maskrcnn_benchmark.modeling.box_coder.BoxCoder"><code class="docutils literal notranslate"><span class="pre">BoxCoder</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.matcher.html">Detection.maskrcnn_benchmark.modeling.matcher module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.matcher.html#Detection.maskrcnn_benchmark.modeling.matcher.Matcher"><code class="docutils literal notranslate"><span class="pre">Matcher</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.poolers.html">Detection.maskrcnn_benchmark.modeling.poolers module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.poolers.html#Detection.maskrcnn_benchmark.modeling.poolers.LevelMapper"><code class="docutils literal notranslate"><span class="pre">LevelMapper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.poolers.html#Detection.maskrcnn_benchmark.modeling.poolers.Pooler"><code class="docutils literal notranslate"><span class="pre">Pooler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.registry.html">Detection.maskrcnn_benchmark.modeling.registry module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.utils.html">Detection.maskrcnn_benchmark.modeling.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.utils.html#Detection.maskrcnn_benchmark.modeling.utils.cat"><code class="docutils literal notranslate"><span class="pre">cat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.modeling.html#module-Detection.maskrcnn_benchmark.modeling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.html">Detection.maskrcnn_benchmark.solver package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.build.html">Detection.maskrcnn_benchmark.solver.build module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.build.html#Detection.maskrcnn_benchmark.solver.build.make_lr_scheduler"><code class="docutils literal notranslate"><span class="pre">make_lr_scheduler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.build.html#Detection.maskrcnn_benchmark.solver.build.make_optimizer"><code class="docutils literal notranslate"><span class="pre">make_optimizer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.lr_scheduler.html">Detection.maskrcnn_benchmark.solver.lr_scheduler module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.lr_scheduler.html#Detection.maskrcnn_benchmark.solver.lr_scheduler.WarmupMultiStepLR"><code class="docutils literal notranslate"><span class="pre">WarmupMultiStepLR</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.solver.html#module-Detection.maskrcnn_benchmark.solver">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.html">Detection.maskrcnn_benchmark.structures package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.bounding_box.html">Detection.maskrcnn_benchmark.structures.bounding_box module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.bounding_box.html#Detection.maskrcnn_benchmark.structures.bounding_box.BoxList"><code class="docutils literal notranslate"><span class="pre">BoxList</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.boxlist_ops.html">Detection.maskrcnn_benchmark.structures.boxlist_ops module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.boxlist_ops.html#Detection.maskrcnn_benchmark.structures.boxlist_ops.boxlist_iou"><code class="docutils literal notranslate"><span class="pre">boxlist_iou()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.boxlist_ops.html#Detection.maskrcnn_benchmark.structures.boxlist_ops.boxlist_nms"><code class="docutils literal notranslate"><span class="pre">boxlist_nms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.boxlist_ops.html#Detection.maskrcnn_benchmark.structures.boxlist_ops.cat_boxlist"><code class="docutils literal notranslate"><span class="pre">cat_boxlist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.boxlist_ops.html#Detection.maskrcnn_benchmark.structures.boxlist_ops.remove_small_boxes"><code class="docutils literal notranslate"><span class="pre">remove_small_boxes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.image_list.html">Detection.maskrcnn_benchmark.structures.image_list module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.image_list.html#Detection.maskrcnn_benchmark.structures.image_list.ImageList"><code class="docutils literal notranslate"><span class="pre">ImageList</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.image_list.html#Detection.maskrcnn_benchmark.structures.image_list.to_image_list"><code class="docutils literal notranslate"><span class="pre">to_image_list()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.segmentation_mask.html">Detection.maskrcnn_benchmark.structures.segmentation_mask module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.segmentation_mask.html#Detection.maskrcnn_benchmark.structures.segmentation_mask.Mask"><code class="docutils literal notranslate"><span class="pre">Mask</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.segmentation_mask.html#Detection.maskrcnn_benchmark.structures.segmentation_mask.Polygons"><code class="docutils literal notranslate"><span class="pre">Polygons</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.segmentation_mask.html#Detection.maskrcnn_benchmark.structures.segmentation_mask.SegmentationMask"><code class="docutils literal notranslate"><span class="pre">SegmentationMask</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.structures.html#module-Detection.maskrcnn_benchmark.structures">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.html">Detection.maskrcnn_benchmark.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.c2_model_loading.html">Detection.maskrcnn_benchmark.utils.c2_model_loading module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.c2_model_loading.html#Detection.maskrcnn_benchmark.utils.c2_model_loading.load_c2_format"><code class="docutils literal notranslate"><span class="pre">load_c2_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.c2_model_loading.html#Detection.maskrcnn_benchmark.utils.c2_model_loading.load_resnet_c2_format"><code class="docutils literal notranslate"><span class="pre">load_resnet_c2_format()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.checkpoint.html">Detection.maskrcnn_benchmark.utils.checkpoint module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.checkpoint.html#Detection.maskrcnn_benchmark.utils.checkpoint.Checkpointer"><code class="docutils literal notranslate"><span class="pre">Checkpointer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.checkpoint.html#Detection.maskrcnn_benchmark.utils.checkpoint.DetectronCheckpointer"><code class="docutils literal notranslate"><span class="pre">DetectronCheckpointer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.collect_env.html">Detection.maskrcnn_benchmark.utils.collect_env module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.collect_env.html#Detection.maskrcnn_benchmark.utils.collect_env.collect_env_info"><code class="docutils literal notranslate"><span class="pre">collect_env_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.collect_env.html#Detection.maskrcnn_benchmark.utils.collect_env.get_pil_version"><code class="docutils literal notranslate"><span class="pre">get_pil_version()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.comm.html">Detection.maskrcnn_benchmark.utils.comm module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.comm.html#Detection.maskrcnn_benchmark.utils.comm.get_rank"><code class="docutils literal notranslate"><span class="pre">get_rank()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.comm.html#Detection.maskrcnn_benchmark.utils.comm.get_world_size"><code class="docutils literal notranslate"><span class="pre">get_world_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.comm.html#Detection.maskrcnn_benchmark.utils.comm.is_main_process"><code class="docutils literal notranslate"><span class="pre">is_main_process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.comm.html#Detection.maskrcnn_benchmark.utils.comm.scatter_gather"><code class="docutils literal notranslate"><span class="pre">scatter_gather()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.comm.html#Detection.maskrcnn_benchmark.utils.comm.synchronize"><code class="docutils literal notranslate"><span class="pre">synchronize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.cv2_util.html">Detection.maskrcnn_benchmark.utils.cv2_util module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.cv2_util.html#Detection.maskrcnn_benchmark.utils.cv2_util.findContours"><code class="docutils literal notranslate"><span class="pre">findContours()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.env.html">Detection.maskrcnn_benchmark.utils.env module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.env.html#Detection.maskrcnn_benchmark.utils.env.setup_custom_environment"><code class="docutils literal notranslate"><span class="pre">setup_custom_environment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.env.html#Detection.maskrcnn_benchmark.utils.env.setup_environment"><code class="docutils literal notranslate"><span class="pre">setup_environment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.imports.html">Detection.maskrcnn_benchmark.utils.imports module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.imports.html#Detection.maskrcnn_benchmark.utils.imports.import_file"><code class="docutils literal notranslate"><span class="pre">import_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.logger.html">Detection.maskrcnn_benchmark.utils.logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.logger.html#Detection.maskrcnn_benchmark.utils.logger.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.metric_logger.html">Detection.maskrcnn_benchmark.utils.metric_logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.metric_logger.html#Detection.maskrcnn_benchmark.utils.metric_logger.MetricLogger"><code class="docutils literal notranslate"><span class="pre">MetricLogger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.metric_logger.html#Detection.maskrcnn_benchmark.utils.metric_logger.SmoothedValue"><code class="docutils literal notranslate"><span class="pre">SmoothedValue</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.miscellaneous.html">Detection.maskrcnn_benchmark.utils.miscellaneous module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.miscellaneous.html#Detection.maskrcnn_benchmark.utils.miscellaneous.mkdir"><code class="docutils literal notranslate"><span class="pre">mkdir()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.model_serialization.html">Detection.maskrcnn_benchmark.utils.model_serialization module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.model_serialization.html#Detection.maskrcnn_benchmark.utils.model_serialization.align_and_update_state_dicts"><code class="docutils literal notranslate"><span class="pre">align_and_update_state_dicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.model_serialization.html#Detection.maskrcnn_benchmark.utils.model_serialization.load_state_dict"><code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.model_serialization.html#Detection.maskrcnn_benchmark.utils.model_serialization.strip_prefix_if_present"><code class="docutils literal notranslate"><span class="pre">strip_prefix_if_present()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.model_zoo.html">Detection.maskrcnn_benchmark.utils.model_zoo module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.model_zoo.html#Detection.maskrcnn_benchmark.utils.model_zoo.cache_url"><code class="docutils literal notranslate"><span class="pre">cache_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.registry.html">Detection.maskrcnn_benchmark.utils.registry module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.registry.html#Detection.maskrcnn_benchmark.utils.registry.Registry"><code class="docutils literal notranslate"><span class="pre">Registry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Detection.maskrcnn_benchmark.utils.html#module-Detection.maskrcnn_benchmark.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-Detection.maskrcnn_benchmark">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Detection.maskrcnn_benchmark" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Detection.html" class="btn btn-neutral float-left" title="Detection package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Detection.maskrcnn_benchmark.config.html" class="btn btn-neutral float-right" title="Detection.maskrcnn_benchmark.config package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Segmentation.generate_rail_pole &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Segmentation.generate_rail_pole</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Segmentation.generate_rail_pole</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">detectron2</span> <span class="kn">import</span> <span class="n">model_zoo</span>
+<span class="kn">from</span> <span class="nn">detectron2.engine</span> <span class="kn">import</span> <span class="n">DefaultPredictor</span>
+<span class="kn">from</span> <span class="nn">detectron2.config</span> <span class="kn">import</span> <span class="n">get_cfg</span>
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">cv2</span><span class="o">,</span> <span class="nn">random</span><span class="o">,</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">config</span>
+
+<span class="kn">from</span> <span class="nn">pycocotools</span> <span class="kn">import</span> <span class="n">mask</span> <span class="k">as</span> <span class="n">mask_save_tool</span>
+
+<div class="viewcode-block" id="generate_rail_pole"><a class="viewcode-back" href="../../Segmentation.html#Segmentation.generate_rail_pole.generate_rail_pole">[docs]</a><span class="k">def</span> <span class="nf">generate_rail_pole</span><span class="p">(</span><span class="n">horseracingResult</span><span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    generate rail pole</span>
+<span class="sd">    This model is trained with detectron2. Therefore, it only requires a few lines of code to load, and test the model.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating Rail Masks&quot;</span><span class="p">)</span>
+    <span class="n">vid_name</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">processing_vid_name</span>
+    <span class="n">track</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">race_info</span><span class="p">[</span><span class="n">vid_name</span><span class="p">][</span><span class="s2">&quot;track&quot;</span><span class="p">]</span> 
+    <span class="n">network_path</span><span class="p">,</span> <span class="n">mean_path</span><span class="p">,</span> <span class="n">batch</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_model_info</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="s2">&quot;RailPoleSegmentation&quot;</span><span class="p">)</span>
+        
+    <span class="n">start_frame</span><span class="p">,</span> <span class="n">end_frame</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">start_end_frames</span><span class="p">[</span><span class="n">vid_name</span><span class="p">]</span>
+    <span class="n">horseracingResult</span><span class="o">.</span><span class="n">load_frames</span><span class="p">(</span><span class="n">vid_name</span><span class="p">,</span> <span class="n">start_frame</span><span class="p">,</span> <span class="n">end_frame</span><span class="p">)</span>
+    
+    <span class="c1"># assuming data only exists in terms of framesetids but not racelabels</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">get_cfg</span><span class="p">()</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">merge_from_file</span><span class="p">(</span><span class="n">model_zoo</span><span class="o">.</span><span class="n">get_config_file</span><span class="p">(</span><span class="s2">&quot;COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml&quot;</span><span class="p">))</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">DATALOADER</span><span class="o">.</span><span class="n">NUM_WORKERS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_HEADS</span><span class="o">.</span><span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># only has one class (ballon).</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">WEIGHTS</span> <span class="o">=</span> <span class="n">network_path</span>  <span class="c1"># path to the model we just trained</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_HEADS</span><span class="o">.</span><span class="n">SCORE_THRESH_TEST</span> <span class="o">=</span> <span class="mf">0.7</span> <span class="c1"># set a custom testing threshold</span>
+
+    <span class="n">predictor</span> <span class="o">=</span> <span class="n">DefaultPredictor</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+    
+    <span class="n">rail_mask_prediction</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;target_frame_size&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span> <span class="p">],</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;start_frame&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_frame</span><span class="p">),</span> <span class="s2">&quot;finish_frame&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_frame</span><span class="p">)}}</span>
+    
+    <span class="k">for</span> <span class="n">frm</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+      <span class="n">outputs</span> <span class="o">=</span> <span class="n">predictor</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">frm</span><span class="p">])</span>
+      
+      <span class="n">boxes</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">pred_boxes</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+      <span class="n">scores</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+      <span class="n">masks</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">pred_masks</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+      
+      <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">boxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">scores</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+          <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+          <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+          <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span>
+          
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">masks</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">,</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">]</span>
+          <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="o">&gt;</span><span class="mf">0.8</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+          <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="o">&lt;=</span><span class="mf">0.8</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+          <span class="c1"># convert to string for ease of saving</span>
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+          <span class="n">m_string</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">mask_save_tool</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">mask</span><span class="p">)[</span><span class="s2">&quot;counts&quot;</span><span class="p">])</span>
+         
+          <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;bbox&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span>
+                     <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="n">b</span><span class="p">]),</span>
+                     <span class="s2">&quot;rle_string&quot;</span><span class="p">:</span> <span class="n">m_string</span><span class="p">})</span>
+
+      <span class="n">rail_mask_prediction</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;frame_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frm</span> <span class="o">+</span> <span class="n">start_frame</span><span class="p">)]</span> <span class="o">=</span> <span class="n">output</span>
+      <span class="k">if</span> <span class="n">frm</span><span class="o">%</span><span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Frame &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frm</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    
+    <span class="c1"># release memory</span>
+    <span class="k">del</span> <span class="n">predictor</span>
+              
+    <span class="c1"># write to json</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">result_dir</span><span class="p">,</span> <span class="s2">&quot;Rail_Pole_Masks&quot;</span><span class="p">,</span> <span class="n">vid_name</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+      <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rail_mask_prediction</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+      <span class="n">file</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+      <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+      
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish writing rail poles&quot;</span><span class="p">)</span>      </div>
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

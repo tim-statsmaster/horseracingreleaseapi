@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SceneClassifier.predictor &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SceneClassifier.predictor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SceneClassifier.predictor</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="kn">from</span> <span class="nn">.resnet_lstm</span> <span class="kn">import</span> <span class="n">ResNetEncoder</span><span class="p">,</span> <span class="n">LSTMDecoder</span>
+
+<div class="viewcode-block" id="SceneClassificationPredictor"><a class="viewcode-back" href="../../SceneClassifier.html#SceneClassifier.predictor.SceneClassificationPredictor">[docs]</a><span class="k">class</span> <span class="nc">SceneClassificationPredictor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder_path</span><span class="p">,</span> <span class="n">decoder_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span><span class="n">encoder_path</span><span class="p">,</span><span class="n">decoder_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exception</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span>
+            <span class="c1">## uncomment below line to pass exception through</span>
+            <span class="c1"># return False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Setup the parameters at initialisation</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">## mean and std of the model (ImageNet mean and std)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="p">(</span><span class="mi">336</span><span class="p">,</span> <span class="mi">336</span><span class="p">)</span>
+        <span class="c1"># prestart, postend, fade, running</span>
+        <span class="c1"># classes_id_map = {  &quot;prestart&quot;:0,</span>
+        <span class="c1">#                     &quot;postend&quot;:1,</span>
+        <span class="c1">#                     &quot;sudden&quot;:2,</span>
+        <span class="c1">#                     &quot;fade&quot;:3,</span>
+        <span class="c1">#                     &quot;running&quot;:4</span>
+        <span class="c1">#                 }</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span> <span class="o">=</span> <span class="p">{</span>  <span class="s2">&quot;prestart&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                            <span class="s2">&quot;postend&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="s2">&quot;fade&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
+                            <span class="s2">&quot;running&quot;</span><span class="p">:</span><span class="mi">3</span>
+                        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_cls</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span><span class="p">)</span>
+
+        <span class="c1">## window size (number of frames) of prediction interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="mi">21</span>
+        <span class="c1">## threshold for start, end, sudden, fade</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_threshold</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fade_threshold</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span><span class="mf">0.59</span><span class="p">)</span>
+        <span class="c1">#start_threshold, end_threshold, sudden_threshold,fade_threshold = (.8000, .9500, .4286,.8367)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fade_interval_max_threshold</span> <span class="o">=</span> <span class="mf">.8</span>
+        <span class="c1">#sudden_interval_max_threshold = .8</span>
+
+        <span class="c1">## speed stats cal from race records, will be used to predict end frame</span>
+        <span class="c1">## Added 3% buffer for wrong start frame detection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_speed</span> <span class="o">=</span> <span class="mf">18.3</span><span class="o">*</span><span class="mf">1.03</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_speed</span> <span class="o">=</span> <span class="mf">14.5</span><span class="o">*</span><span class="mf">0.97</span>
+
+        <span class="c1">## max start interval in sec between positive start prediction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_start_interval</span> <span class="o">=</span> <span class="mf">2.2</span>
+
+        <span class="c1">## max distance (in sec) between continues fade predictions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_fade_distance</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1">## max distance (in sec) between continues sudden predictions</span>
+        <span class="c1">#max_sudden_distance = 0.5</span>
+
+        <span class="c1">## number of perd per frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_pred_per_frame</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="c1">## a prediction will be run if #pred_interval frames are updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="o">//</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pred_per_frame</span>
+
+    <span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder_path</span><span class="p">,</span> <span class="n">decoder_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Load the Scene Classification model</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            encoder_path (string): Path to SceneClassification Encoder model</span>
+<span class="sd">            decoder_path (string): Path to SceneClassification Encoder model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">### Load Classification Model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using: &#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">ResNetEncoder</span><span class="p">(</span><span class="n">resnet_deepth</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                        <span class="n">pretrain</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">fc_hidden1</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                        <span class="n">fc_hidden2</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+                        <span class="n">dropout_prob</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                        <span class="n">output_dim</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+
+        <span class="n">decoder</span> <span class="o">=</span> <span class="n">LSTMDecoder</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+                            <span class="n">num_lstm_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                            <span class="n">lstm_hidden</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+                            <span class="n">fc_dim</span><span class="o">=</span><span class="mi">56</span><span class="p">,</span>
+                            <span class="n">dropout_prob</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                            <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_cls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">encoder_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">decoder_path</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SceneClassificationPredictor.clear"><a class="viewcode-back" href="../../SceneClassifier.html#SceneClassifier.predictor.SceneClassificationPredictor.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_frame_count</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames_preds_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames_avg_preds_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cc_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_run_length</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_run_length</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_frame</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_fps</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1">## max start time from race records, will be used to predict start frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_start_time</span> <span class="o">=</span> <span class="mi">80</span>
+
+        <span class="c1">### For preprocessed frame cache and batch predict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cached_frame</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_run</span><span class="o">=</span><span class="p">[]</span></div>
+
+<div class="viewcode-block" id="SceneClassificationPredictor.predict"><a class="viewcode-back" href="../../SceneClassifier.html#SceneClassifier.predictor.SceneClassificationPredictor.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video_path</span><span class="p">,</span> <span class="n">distance</span><span class="p">):</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>
+        <span class="c1">## the model_fps setting must follow the sampling method defined in sampling.py</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_fps</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span> <span class="o">==</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_fps</span> <span class="o">=</span> <span class="mf">12.5</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">model_fps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_COUNT</span><span class="p">))</span>
+
+        <span class="c1">### Adjust the max start time to 40s if the video is shorter than the max_start_time</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_frame</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_start_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_start_time</span> <span class="o">=</span> <span class="mi">40</span>
+
+        <span class="c1">## max/min_run_length in number of frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_run_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">distance</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">max_speed</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_run_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">distance</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">min_speed</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="p">)</span>
+
+        <span class="c1">## Read through the video until start,end,camera change are detected/video has ended</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">success</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1">## frames_indices_lst should be [(frame_num1, frame1), (frame_num2, frame2), ...]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="p">,</span> <span class="n">frame</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">used_frame_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1">## predict only when frames_indices_lst is fulled and enough new frames updated into the list</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span> <span class="ow">and</span> \
+               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">used_frame_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_interval</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">used_frame_count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1">#self._predict() # Deprecated</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_batch_predict</span><span class="p">()</span>
+
+            <span class="c1">## burn out frames</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">success</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1">## self._predict() will set self.done to be true if the prediction is done (i.e. start/end/fade all predicted)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+                <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="k">break</span>
+
+        <span class="n">all_preds</span><span class="p">,</span> <span class="n">start_frame</span><span class="p">,</span> <span class="n">end_frame</span><span class="p">,</span> <span class="n">cc_lst</span><span class="p">,</span> <span class="n">cap_fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_preds_lst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cc_lst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span>
+
+        <span class="k">return</span> <span class="n">all_preds</span><span class="p">,</span> <span class="n">start_frame</span><span class="p">,</span> <span class="n">end_frame</span><span class="p">,</span> <span class="n">cc_lst</span><span class="p">,</span> <span class="n">cap_fps</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ### Batch predict, only predict and postprocess if stored batch == batch size</span>
+<span class="sd">        or the video frames left &lt;= step*window_size*batch_size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_batch_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Batch predict, only predict and postprocess if stored batch == batch size</span>
+<span class="sd">            or the video frames left &lt;= step*window_size*batch_size</span>
+<span class="sd">        Args:</span>
+<span class="sd">            batch_size (int, optional): number of batches to process at once, default is 16</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="p">]</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_run</span> <span class="o">+=</span> <span class="p">[{</span><span class="s2">&quot;indices_lst&quot;</span><span class="p">:</span><span class="n">indices</span><span class="p">,</span><span class="s2">&quot;preprocessed_frames&quot;</span><span class="p">:</span><span class="n">frames</span><span class="p">}]</span>
+        <span class="c1">### Prevent case where video ends early before batch size is matched</span>
+        <span class="n">batch_frm_threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">*</span><span class="n">batch_size</span>
+        <span class="n">vid_frame_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_frame</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_run</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span> <span class="ow">or</span> <span class="n">vid_frame_left</span><span class="o">&lt;=</span><span class="n">batch_frm_threshold</span><span class="p">:</span>
+            <span class="n">batched_frames</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">each_run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_run</span><span class="p">:</span>
+                <span class="n">batched_frames</span><span class="o">+=</span><span class="p">[</span><span class="n">each_run</span><span class="p">[</span><span class="s2">&quot;preprocessed_frames&quot;</span><span class="p">]]</span>
+
+            <span class="n">batched_frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">batched_frames</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">X_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">batched_frames</span><span class="p">)</span>
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">X_embedding</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_cls</span><span class="p">)</span>
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">y_hat</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">each_run</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_run</span><span class="p">):</span>
+                    <span class="n">indices</span> <span class="o">=</span> <span class="n">each_run</span><span class="p">[</span><span class="s2">&quot;indices_lst&quot;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">frames_preds_lst</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="n">i</span><span class="p">])))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch_run</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_postprocess</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SceneClassificationPredictor.preprocess"><a class="viewcode-back" href="../../SceneClassifier.html#SceneClassifier.predictor.SceneClassificationPredictor.preprocess">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames_indices_lst</span><span class="p">,</span> <span class="n">use_cache</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">indice</span><span class="p">,</span><span class="n">frame</span> <span class="ow">in</span> <span class="n">frames_indices_lst</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">indice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_frame</span><span class="p">:</span>
+                    <span class="n">frames</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_frame</span><span class="p">[</span><span class="n">indice</span><span class="p">]]</span>
+                    <span class="k">continue</span>
+
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_AREA</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="p">(</span><span class="n">frame</span><span class="o">/</span><span class="mi">255</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">std</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">frames</span> <span class="o">+=</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cached_frame</span><span class="p">[</span><span class="n">indice</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+
+        <span class="c1">### Clean the not used cached frames</span>
+        <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+            <span class="n">min_indice</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_indices_lst</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_indice</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_frame</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_frame</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">frames</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_avg_pred</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Each frame is being detected 3 times, except for first (self.pred_interval * self.step)*(self.num_pred_per_frame-1) frame.</span>
+<span class="sd">            This function is called when detect start/end, to compute the average prediction for each frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frame_pred_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_preds_lst</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+            <span class="n">framenum</span> <span class="o">=</span> <span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">each</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="n">framenum</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">frame_pred_dict</span><span class="p">:</span>
+                <span class="n">frame_pred_dict</span><span class="p">[</span><span class="n">framenum</span><span class="p">]</span> <span class="o">=</span> <span class="n">preds</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">frame_pred_dict</span><span class="p">[</span><span class="n">framenum</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame_pred_dict</span><span class="p">[</span><span class="n">framenum</span><span class="p">],</span><span class="n">preds</span><span class="p">,</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">avg_frame_pred_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">framenum</span><span class="p">,</span><span class="n">frame_preds</span> <span class="ow">in</span> <span class="n">frame_pred_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">### Consider the frame as valid only when self.num_pred_per_frame is satisfied</span>
+            <span class="c1">### except the first (self.pred_interval * self.step -1)*(self.num_pred_per_frame-1) frames</span>
+            <span class="c1">### This is to make sure every frame is being predicted for self.num_pred_per_frame times before used</span>
+            <span class="k">if</span> <span class="n">framenum</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_interval</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pred_per_frame</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">frame_preds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pred_per_frame</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+            <span class="n">avg_frame_pred_list</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">framenum</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">frame_preds</span><span class="p">,</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="n">avg_frame_pred_list</span>
+
+    <span class="k">def</span> <span class="nf">_predict_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+        <span class="c1">### Use average prediction for start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames_avg_preds_lst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_avg_pred</span><span class="p">()</span>
+        <span class="c1">## use the last start prediction of the longest continued start frame prediction interval</span>
+        <span class="n">start_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span><span class="p">[</span><span class="s2">&quot;prestart&quot;</span><span class="p">]</span>
+        <span class="n">start_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_avg_preds_lst</span> <span class="k">if</span> <span class="n">pred</span><span class="p">[</span><span class="n">start_id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_preds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">max_continue_start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">carrying_continue_start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start_preds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">start_preds</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">start_preds</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">start_frame</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_run_length</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">start_preds</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">start_preds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_start_interval</span><span class="p">:</span>
+                <span class="n">carrying_continue_start</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">carrying_continue_start</span> <span class="o">&gt;</span> <span class="n">max_continue_start</span><span class="p">:</span>
+                    <span class="n">max_continue_start</span> <span class="o">=</span> <span class="n">carrying_continue_start</span>
+                    <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start_preds</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">carrying_continue_start</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_frame</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_predict_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+        <span class="c1">## use the first end prediction within the possible end frame range calculated from start and distance</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1">### Use average prediction for end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames_avg_preds_lst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_avg_pred</span><span class="p">()</span>
+        <span class="n">end_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span><span class="p">[</span><span class="s2">&quot;postend&quot;</span><span class="p">]</span>
+        <span class="n">end_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_avg_preds_lst</span> <span class="k">if</span> <span class="n">pred</span><span class="p">[</span><span class="n">end_id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">]</span>
+        <span class="n">end_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">end_preds</span> <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">min_run_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">max_run_length</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">end_preds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_preds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_predict_cc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Predict the camera change after start frame and end frame is found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">## find the fades</span>
+        <span class="n">fade_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span><span class="p">[</span><span class="s2">&quot;fade&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="si">}</span><span class="s1">: finding cc&#39;</span><span class="p">)</span>
+        <span class="n">cc_preds</span> <span class="o">=</span> <span class="p">[(</span><span class="n">idx</span><span class="p">,</span> <span class="n">pred</span><span class="p">[</span><span class="n">fade_id</span><span class="p">])</span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_preds_lst</span> <span class="k">if</span> <span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="n">fade_id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_threshold</span> <span class="ow">and</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span><span class="p">))]</span>
+        <span class="n">cc_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cc_conf</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cc_max_conf</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cc_count</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">cc_preds</span><span class="p">:</span>
+            <span class="n">included</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cc_lst</span><span class="p">):</span>
+                <span class="c1">## if current prediction is actually inside the range of one of the existing predictions</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_fade_distance</span><span class="p">,</span> <span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_fade_distance</span><span class="p">):</span>
+                    <span class="n">included</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx</span><span class="p">)</span>
+                    <span class="n">cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">idx</span><span class="p">)</span>
+                    <span class="n">cc_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">cc_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">cc_count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">conf</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">cc_count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">cc_max_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cc_max_conf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">conf</span><span class="p">)</span>
+                    <span class="n">cc_count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="c1">## append a new fade range</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">included</span><span class="p">:</span>
+                <span class="n">cc_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+                <span class="n">cc_max_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+                <span class="n">cc_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">cc_lst</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cc before filtering: </span><span class="si">{</span><span class="n">cc_lst</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">cc_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">cc</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cc_lst</span><span class="p">)</span> <span class="k">if</span> <span class="n">cc_max_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">fade_interval_max_threshold</span><span class="p">]</span>
+
+        <span class="c1">### Only used with sudden</span>
+        <span class="k">if</span> <span class="s2">&quot;sudden&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span><span class="p">:</span>
+            <span class="c1">## find the sudden</span>
+            <span class="n">sudden_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_id_map</span><span class="p">[</span><span class="s2">&quot;sudden&quot;</span><span class="p">]</span>
+            <span class="n">sudden_cc_preds</span> <span class="o">=</span> <span class="p">[(</span><span class="n">idx</span><span class="p">,</span> <span class="n">pred</span><span class="p">[</span><span class="n">sudden_id</span><span class="p">])</span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_preds_lst</span> <span class="k">if</span> <span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="n">sudden_id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sudden_threshold</span> <span class="ow">and</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span><span class="p">))]</span>
+            <span class="n">sudden_cc_lst</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sudden_cc_conf</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sudden_cc_max_conf</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sudden_cc_count</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">sudden_cc_preds</span><span class="p">:</span>
+                <span class="n">included</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sudden_cc_lst</span><span class="p">):</span>
+                    <span class="c1">## if current prediction is actually inside the range of one of the existing predictions</span>
+                    <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_sudden_distance</span><span class="p">),</span> <span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_sudden_distance</span><span class="p">)):</span>
+                        <span class="n">included</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">sudden_cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sudden_cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx</span><span class="p">)</span>
+                        <span class="n">sudden_cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sudden_cc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">idx</span><span class="p">)</span>
+                        <span class="n">sudden_cc_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sudden_cc_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">sudden_cc_count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">conf</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">sudden_cc_count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">sudden_cc_max_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sudden_cc_max_conf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">conf</span><span class="p">)</span>
+                        <span class="n">sudden_cc_count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">break</span>
+                <span class="c1">## append a new sudden range</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">included</span><span class="p">:</span>
+                    <span class="n">sudden_cc_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+                    <span class="n">sudden_cc_max_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+                    <span class="n">sudden_cc_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">sudden_cc_lst</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;sudden cc before filtering: </span><span class="si">{</span><span class="n">sudden_cc_lst</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">sudden_cc_lst</span> <span class="o">=</span> <span class="p">[[</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span><span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sudden_cc_lst</span><span class="p">)</span> <span class="k">if</span> <span class="n">sudden_cc_max_conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">sudden_interval_max_threshold</span><span class="p">]</span>
+
+            <span class="c1">### If its not faded, use sudden_cc_list instead, Assuming theres no mixed sudden and fade cc</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_lst</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">cc_lst</span> <span class="o">=</span> <span class="n">sudden_cc_lst</span>
+                <span class="n">cc_conf</span> <span class="o">=</span> <span class="n">sudden_cc_conf</span>
+                <span class="n">cc_count</span> <span class="o">=</span> <span class="n">sudden_cc_count</span>
+                <span class="n">cc_max_conf</span> <span class="o">=</span> <span class="n">sudden_cc_max_conf</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cc_lst</span> <span class="o">=</span> <span class="n">cc_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="si">}</span><span class="s1">: found cc = </span><span class="si">{</span><span class="n">cc_lst</span><span class="si">}</span><span class="s1"> | avg. conf: </span><span class="si">{</span><span class="n">cc_conf</span><span class="si">}</span><span class="s1"> | vote: </span><span class="si">{</span><span class="n">cc_count</span><span class="si">}</span><span class="s1"> | max. conf: </span><span class="si">{</span><span class="n">cc_max_conf</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1">## find the start_frame, when current time is larger than max_start_time</span>
+        <span class="c1">## keep reduce the threshold if start frame can&#39;t be found</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">cap_fps</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_start_time</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="o">&gt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_frame</span><span class="o">-</span><span class="mi">10</span><span class="p">):</span>
+            <span class="n">threshold_discount</span> <span class="o">=</span> <span class="mf">0.85</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_threshold</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">threshold_discount</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="si">}</span><span class="s1">: finding start with threshold: </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_predict_start</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
+                <span class="n">factor</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="si">}</span><span class="s1">: found start = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="c1">### Added threshold &lt; 0.001: to avoid stuck in this loop</span>
+                <span class="k">if</span> <span class="n">threshold</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start frame cannot be found, Skipping...&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1">## find the end_frame, when current time is larger than max_run_length plus start_frame</span>
+        <span class="c1">## keep reduce the threshold if end frame can&#39;t be found</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">max_run_length</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="o">&gt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_frame</span><span class="o">-</span><span class="mi">10</span><span class="p">):</span>
+            <span class="n">threshold_discount</span> <span class="o">=</span> <span class="mf">0.85</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_threshold</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">threshold_discount</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="si">}</span><span class="s1">: finding end with threshold: </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_predict_end</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
+                <span class="n">factor</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_video_idx</span><span class="si">}</span><span class="s1">: found end = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="c1">### Added threshold &lt; 0.001: to avoid stuck in this loop</span>
+                <span class="k">if</span> <span class="n">threshold</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End frame cannot be found, Skipping...&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1">## find the camera change</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_frame</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_frame</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_predict_cc</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

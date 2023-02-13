@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracking.final_tracking &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Tracking.final_tracking</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Tracking.final_tracking</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">config</span>
+<span class="kn">from</span> <span class="nn">.utils.subsequence</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">len_thres</span> <span class="o">=</span> <span class="mi">250</span> <span class="c1"># remove sequences below this threshold when outputing result</span>
+
+<div class="viewcode-block" id="match_with_triplet_saddlecloth"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.match_with_triplet_saddlecloth">[docs]</a><span class="k">def</span> <span class="nf">match_with_triplet_saddlecloth</span><span class="p">(</span><span class="n">subsequences</span><span class="p">,</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">triplet_features_caps</span><span class="p">,</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">camchange</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">):</span>
+
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  This function performs the following functions</span>
+<span class="sd">  1) divides the subsequences into different subraces</span>
+<span class="sd">  2) compute the mean triplet cap and jockey features for each subsequences</span>
+<span class="sd">  3) use the triplet thresholds, triplet features, saddlecloth scores, saddlecloth thresholds to pair up the subsequences</span>
+<span class="sd">  4) the paired up subsequences are separated into batches &quot;matchlist_step&quot; in terms of priority</span>
+<span class="sd">  5) using the pair of subsequences to form group of subsequences that belongs to the same jockeys</span>
+<span class="sd">  6) Join the subsequences within the group to form one trajectory</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;match_with_triplet_saddlecloth ... &quot;</span><span class="p">)</span>
+  <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.35</span>
+
+  <span class="n">num_subrace</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">camchange</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># subrace means the portion of the race without camera change</span>
+  <span class="n">subraces</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_subrace</span><span class="p">)]</span>
+  
+  <span class="c1"># divides the subsequences into different subraces</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">camchange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">subraces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)]</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">subraces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">camchange</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="k">if</span> <span class="n">num_subrace</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">subraces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">camchange</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_subrace</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+      <span class="n">subraces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">camchange</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">camchange</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+  
+
+  <span class="c1"># get the mean triplet feature for cap and jockey for each subsequences</span>
+  <span class="n">triplet_mean_seq_jockey</span> <span class="o">=</span> <span class="p">[</span> <span class="n">get_sequence_tripfeat</span><span class="p">(</span><span class="n">sq</span><span class="p">,</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="o">=</span><span class="n">jockey_cap_relation</span><span class="p">)</span> <span class="k">for</span> <span class="n">sq</span> <span class="ow">in</span> <span class="n">subsequences</span><span class="p">]</span>
+  <span class="n">triplet_mean_seq_cap</span> <span class="o">=</span> <span class="p">[</span> <span class="n">get_sequence_tripfeat</span><span class="p">(</span><span class="n">sq</span><span class="p">,</span> <span class="n">triplet_features_caps</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">sq</span> <span class="ow">in</span> <span class="n">subsequences</span><span class="p">]</span>
+
+  <span class="n">match_thres</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;match_thres&#39;</span><span class="p">]</span>
+  <span class="n">triplet_thres</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;triplet_thres&#39;</span><span class="p">]</span>
+  <span class="n">triplet_thres_high</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;triplet_thres_high&#39;</span><span class="p">]</span>
+  <span class="n">triplet_thres_low</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;triplet_thres_low&#39;</span><span class="p">]</span>
+  <span class="n">triplet_thres_jockey</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;triplet_thres_jockey&#39;</span><span class="p">]</span>
+  <span class="n">overlap_thres</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;overlap_thres&#39;</span><span class="p">]</span>
+ 
+  <span class="c1"># separate the subsequences into different batches for matching</span>
+  <span class="n">matchlist_steps</span> <span class="o">=</span> <span class="p">[[],[],[],[],[],[],[]]</span>
+  
+  <span class="k">for</span> <span class="n">feid</span><span class="p">,</span> <span class="n">sq1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">beid</span><span class="p">,</span> <span class="n">sq2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">feid</span> <span class="o">==</span> <span class="n">beid</span><span class="p">:</span>
+        <span class="k">continue</span>
+      
+      <span class="n">diff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">beid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">feid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="n">subsequences</span><span class="p">[</span><span class="n">feid</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+      <span class="k">if</span> <span class="n">diff</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">overlap_thres</span><span class="p">:</span> <span class="c1">#ovelap</span>
+        <span class="k">continue</span>
+
+      <span class="c1"># calculate cap feature dist and use the dist to calculate cap score</span>
+      <span class="n">tripdistavg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">triplet_mean_seq_cap</span><span class="p">[</span><span class="n">feid</span><span class="p">]</span> <span class="o">-</span> <span class="n">triplet_mean_seq_cap</span><span class="p">[</span><span class="n">beid</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+      <span class="n">score_cap</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tripdistavg</span><span class="p">)</span>
+ 
+      <span class="c1"># calculate jockey body score and if there is no jockey body for calculation, assign 0.55 to the jockey score.</span>
+      <span class="k">if</span> <span class="n">triplet_mean_seq_jockey</span><span class="p">[</span><span class="n">feid</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">triplet_mean_seq_jockey</span><span class="p">[</span><span class="n">beid</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>
+        <span class="n">jockey_tripdistavg</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">triplet_mean_seq_jockey</span><span class="p">[</span><span class="n">feid</span><span class="p">]</span> <span class="o">-</span> <span class="n">triplet_mean_seq_jockey</span><span class="p">[</span><span class="n">beid</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="n">score_jockey</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">jockey_tripdistavg</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">score_jockey</span> <span class="o">=</span> <span class="n">triplet_thres</span> <span class="o">+</span> <span class="mf">0.5</span>	<span class="c1">#add 0.5 to pass step 4 5</span>
+
+      <span class="n">score_triplet</span> <span class="o">=</span> <span class="n">score_cap</span> <span class="o">+</span> <span class="n">score_jockey</span>
+      
+      <span class="n">st_score</span> <span class="o">=</span> <span class="mf">1.0</span>
+      <span class="n">same_subrace</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="k">for</span> <span class="n">subrace</span> <span class="ow">in</span> <span class="n">subraces</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">feid</span> <span class="ow">in</span> <span class="n">subrace</span> <span class="ow">and</span> <span class="n">beid</span> <span class="ow">in</span> <span class="n">subrace</span><span class="p">:</span>
+          <span class="n">same_subrace</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="c1"># if in same subrace, check spatial temporal consistency get st_score</span>
+          <span class="n">st_score</span> <span class="o">=</span> <span class="n">check_jump_seqs</span><span class="p">(</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">)</span>
+          <span class="n">score_triplet</span> <span class="o">*=</span> <span class="n">st_score</span>
+
+    <span class="c1"># saddlecloth number similary consider predicted id, as well as its score (cumulative probability in a subsequence)</span>
+    <span class="c1"># logistic sigmoid function f(x) = 1/(1+exp(-sigma*x))</span>
+	  <span class="c1"># x negative when different number, f(-x) = 1 - f(x)</span>
+	  <span class="c1"># if one of subsequences has no number, score = 0.5</span>
+	  <span class="c1"># if both of subsequences has number, they are different, score &lt; 0.5</span>
+	  <span class="c1"># if both of subsequences has number, they are same, score &gt; 0.5</span>
+     
+      <span class="n">id1</span><span class="p">,</span> <span class="n">score1</span> <span class="o">=</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">feid</span><span class="p">]</span>
+      <span class="n">id2</span><span class="p">,</span> <span class="n">score2</span> <span class="o">=</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">beid</span><span class="p">]</span>
+
+      <span class="n">dif_num</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">id1</span> <span class="o">!=</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+      <span class="n">same_num</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">id1</span> <span class="o">==</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+ 
+      <span class="n">score_scn</span> <span class="o">=</span> <span class="mf">1.0</span>
+      <span class="n">score_scn_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">score1</span><span class="p">))</span>
+      <span class="n">score_scn_2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">score2</span><span class="p">))</span>
+      <span class="k">if</span> <span class="n">dif_num</span><span class="p">:</span>
+        <span class="n">score_scn_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">score_scn_1</span>
+        <span class="n">score_scn_2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">score_scn_2</span>
+      <span class="n">score_scn</span> <span class="o">=</span> <span class="n">score_scn_1</span> <span class="o">*</span> <span class="n">score_scn_2</span>
+      <span class="n">score_all</span> <span class="o">=</span> <span class="n">score_triplet</span> <span class="o">*</span> <span class="n">score_scn</span>
+
+      <span class="c1">#step 0 2 4 for pairs of subsequences in same subraces prior to</span>
+      <span class="c1">#step 1 3 5 for pairs of subsequences in different subraces</span>
+      
+      <span class="c1">#step 0 1 scoring subsequences with similar cap, similar body and same number </span>
+      <span class="k">if</span> <span class="n">score_all</span> <span class="o">&gt;</span> <span class="n">match_thres</span> <span class="ow">and</span> <span class="n">score_jockey</span> <span class="o">&gt;=</span> <span class="n">triplet_thres_jockey</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">same_subrace</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">,</span> <span class="n">score_all</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">,</span> <span class="n">score_all</span><span class="p">])</span>
+
+      <span class="c1">#step 2 3 scoring pairs of subsequences only with similar cap, similar body, without number, high threshold</span>
+      <span class="k">elif</span> <span class="n">score_cap</span> <span class="o">&gt;</span> <span class="n">triplet_thres_high</span> <span class="ow">or</span> <span class="n">score_jockey</span> <span class="o">&gt;</span> <span class="n">triplet_thres_high</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">same_subrace</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">])</span>
+
+      <span class="c1">#step 4 5 same as step 2 3 with normal thresholds</span>
+      <span class="k">elif</span> <span class="n">score_cap</span> <span class="o">&gt;</span> <span class="n">triplet_thres</span> <span class="ow">or</span> <span class="n">score_jockey</span> <span class="o">&gt;</span> <span class="n">triplet_thres</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">same_subrace</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">])</span>
+
+      <span class="c1">#step 6 finaly if two subsequences have same number, accept with lower threshold</span>
+      <span class="k">elif</span> <span class="n">same_num</span> <span class="ow">and</span> <span class="n">score_cap</span> <span class="o">&gt;</span> <span class="n">triplet_thres_low</span> <span class="ow">and</span> <span class="n">score_jockey</span> <span class="o">&gt;</span> <span class="n">triplet_thres_low</span><span class="p">:</span>
+          <span class="n">matchlist_steps</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">feid</span><span class="p">,</span> <span class="n">beid</span><span class="p">,</span> <span class="n">score_triplet</span><span class="p">])</span>
+
+  <span class="n">matchlist</span> <span class="o">=</span> <span class="p">[</span> <span class="n">item</span> <span class="k">for</span> <span class="n">match_step</span> <span class="ow">in</span> <span class="n">matchlist_steps</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sort_list_by_col</span><span class="p">(</span><span class="n">match_step</span><span class="p">)]</span>
+  <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">match_step</span><span class="p">)</span> <span class="k">for</span> <span class="n">match_step</span> <span class="ow">in</span> <span class="n">matchlist_steps</span><span class="p">]</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;tracking in 7 steps: &#39;</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+  
+  <span class="c1"># form groups with the subsequences and assign them the corresponding ids</span>
+  <span class="n">groups</span><span class="p">,</span> <span class="n">id_groups</span> <span class="o">=</span> <span class="n">search_match_with_id</span><span class="p">(</span><span class="n">matchlist</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">camchange</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">triplet_mean_seq_cap</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;num of sequences &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">([[</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]))</span>
+
+  <span class="n">matched_subsequences</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="c1"># put the sequences together (join subsequences for each group)</span>
+  <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+    <span class="n">sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+      <span class="c1"># merge subsequence</span>
+      <span class="n">overlap_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="mi">0</span><span class="p">,:]))</span>
+      <span class="n">overlap</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap_set</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">overlap</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sq</span><span class="p">[:,:</span><span class="n">sq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">overlap</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])][:,</span><span class="n">overlap</span><span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>  
+        <span class="n">sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sq</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])][:,</span><span class="n">overlap</span><span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">matched_subsequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sq</span><span class="p">)</span>
+
+  <span class="c1"># remove too short subsequences and sort them according to group number</span>
+  <span class="n">subsequences</span> <span class="o">=</span> <span class="n">matched_subsequences</span>
+  <span class="n">subsequences</span><span class="p">,</span> <span class="n">id_groups</span>  <span class="o">=</span> <span class="n">remove_short_subsequences2</span><span class="p">(</span><span class="n">subsequences</span><span class="p">,</span> <span class="n">id_groups</span><span class="p">,</span> <span class="n">len_thres</span><span class="p">)</span>
+  <span class="n">subsequences</span><span class="p">,</span> <span class="n">id_groups</span>  <span class="o">=</span> <span class="n">sort_subsequences2</span><span class="p">(</span><span class="n">subsequences</span><span class="p">,</span> <span class="n">id_groups</span><span class="p">)</span>
+  
+  <span class="c1">#remove none</span>
+  <span class="k">for</span> <span class="n">iid</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">id_groups</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">id_groups</span><span class="p">[</span><span class="n">iid</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;matching time: &#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">ti</span><span class="p">)</span>
+  
+  <span class="k">return</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">id_groups</span></div>
+  
+  
+<div class="viewcode-block" id="search_match_with_id"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.search_match_with_id">[docs]</a><span class="k">def</span> <span class="nf">search_match_with_id</span><span class="p">(</span><span class="n">mlist</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">camchange</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">triplet_mean_seq</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">):</span>
+        
+    <span class="n">match_thres</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;match_thres&#39;</span><span class="p">]</span>
+    <span class="n">triplet_thres</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;triplet_thres&#39;</span><span class="p">]</span>
+    <span class="n">triplet_thres_gp</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;triplet_thres_gp&#39;</span><span class="p">]</span>
+    <span class="n">overlap_thres</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="s1">&#39;overlap_thres&#39;</span><span class="p">]</span>
+
+    <span class="n">t_step_2</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">count_mlist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">matched</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.35</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">mlist</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">s1id</span><span class="p">,</span> <span class="n">s2id</span> <span class="o">=</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">matched</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">s1id</span><span class="p">,</span> <span class="n">s2id</span><span class="p">])</span>
+      <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span> <span class="o">=</span> <span class="p">[</span><span class="n">s1id</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">s1id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">s1id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">s2id</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">s2id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">s2id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+      <span class="n">m1ing</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+      <span class="n">m2ing</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+      <span class="k">for</span> <span class="n">gid</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">m1</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+          <span class="n">m1ing</span> <span class="o">=</span> <span class="n">gid</span>
+        <span class="k">if</span> <span class="n">m2</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+          <span class="n">m2ing</span> <span class="o">=</span> <span class="n">gid</span>
+      
+      <span class="c1"># if they are already in the same group, no need of merging</span>
+      <span class="k">if</span> <span class="n">m1ing</span> <span class="o">==</span> <span class="n">m2ing</span> <span class="ow">and</span> <span class="n">m1ing</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">mlist</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">count_mlist</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">continue</span>
+      
+      <span class="c1"># if it is not belong to any of group, creat a new group</span>
+
+      <span class="k">if</span> <span class="n">m1ing</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">m1</span><span class="p">])</span>
+        <span class="n">m1ing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+      <span class="k">if</span> <span class="n">m2ing</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">m2</span><span class="p">])</span>
+        <span class="n">m2ing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+
+      <span class="c1"># check if the two subsequences have overlapping</span>
+      <span class="k">if</span> <span class="n">check_overlap_gps</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">m1ing</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">m2ing</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">)</span> <span class="ow">and</span> \
+         <span class="n">check_jump_gps</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">m1ing</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">m2ing</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">,</span> <span class="n">camchange</span><span class="p">):</span>
+        
+        <span class="c1"># step 1 2 compute group id instead of sequence id</span>
+        <span class="n">score_triplet</span> <span class="o">=</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">count_mlist</span> <span class="o">&lt;</span> <span class="n">t_step_2</span><span class="p">:</span>
+          <span class="n">dif_num</span> <span class="o">=</span> <span class="kc">False</span>
+          <span class="n">id1</span><span class="p">,</span> <span class="n">score1</span> <span class="o">=</span> <span class="n">compute_group_id</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">m1ing</span><span class="p">],</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">)</span>
+          <span class="n">id2</span><span class="p">,</span> <span class="n">score2</span> <span class="o">=</span> <span class="n">compute_group_id</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">m2ing</span><span class="p">],</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">id1</span> <span class="o">!=</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+           <span class="n">dif_num</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="n">score_scn_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">score1</span><span class="p">))</span>
+          <span class="n">score_scn_2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">score2</span><span class="p">))</span>
+          <span class="k">if</span> <span class="n">dif_num</span><span class="p">:</span>
+           <span class="n">score_scn_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">score_scn_1</span>
+           <span class="n">score_scn_2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">score_scn_2</span>
+          <span class="n">score_scn</span> <span class="o">=</span> <span class="n">score_scn_1</span> <span class="o">*</span> <span class="n">score_scn_2</span>
+          <span class="n">score_all</span> <span class="o">=</span> <span class="n">score_triplet</span> <span class="o">*</span> <span class="n">score_scn</span>
+
+          <span class="k">if</span> <span class="n">score_all</span> <span class="o">&lt;=</span> <span class="n">match_thres</span><span class="p">:</span>
+           <span class="k">if</span> <span class="n">score_triplet</span> <span class="o">&gt;</span> <span class="n">triplet_thres</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># because score_triplet = score_cap + score_jockey</span>
+             <span class="n">insert_ok</span> <span class="o">=</span> <span class="kc">False</span>
+             <span class="n">j</span> <span class="o">=</span> <span class="n">t_step_2</span> <span class="o">-</span> <span class="n">count_mlist</span>
+             <span class="k">if</span> <span class="n">score_triplet</span> <span class="o">&gt;</span> <span class="n">mlist</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]:</span>
+               <span class="n">mlist</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+               <span class="n">insert_ok</span> <span class="o">=</span> <span class="kc">True</span>
+             <span class="k">else</span><span class="p">:</span>
+               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mlist</span><span class="p">)):</span>
+                 <span class="k">if</span> <span class="n">score_triplet</span> <span class="o">&lt;=</span> <span class="n">mlist</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">score_triplet</span> <span class="o">&gt;=</span> <span class="n">mlist</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]:</span>
+                   <span class="n">mlist</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                   <span class="n">insert_ok</span> <span class="o">=</span> <span class="kc">True</span>
+                   <span class="k">break</span>
+             <span class="k">if</span> <span class="ow">not</span> <span class="n">insert_ok</span><span class="p">:</span>
+               <span class="n">mlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+          
+          <span class="k">if</span> <span class="n">score_triplet</span> <span class="o">&gt;</span> <span class="n">triplet_thres</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">insert_ok</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">t_step_2</span> <span class="o">-</span> <span class="n">count_mlist</span>
+            <span class="k">if</span> <span class="n">score_triplet</span> <span class="o">&gt;</span> <span class="n">mlist</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]:</span>
+              <span class="n">mlist</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+              <span class="n">insert_ok</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+              <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mlist</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">score_triplet</span> <span class="o">&lt;=</span> <span class="n">mlist</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">score_triplet</span> <span class="o">&gt;=</span> <span class="n">mlist</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]:</span>
+                  <span class="n">mlist</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                  <span class="n">insert_ok</span> <span class="o">=</span> <span class="kc">True</span>
+                  <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">insert_ok</span><span class="p">:</span>
+              <span class="n">mlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">count_mlist</span> <span class="o">&gt;=</span> <span class="n">t_step_2</span><span class="p">:</span>
+          <span class="n">groups</span><span class="p">[</span><span class="n">m1ing</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_group</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">m1ing</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">m2ing</span><span class="p">],</span> <span class="n">overlap_thres</span><span class="p">)</span>
+          <span class="n">groups</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">m2ing</span><span class="p">)</span>
+        <span class="c1">#if different number but triplet similar, append to the end of matching list</span>
+        <span class="k">elif</span> <span class="n">score_triplet</span> <span class="o">&gt;</span> <span class="n">triplet_thres</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">mlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    
+      <span class="n">mlist</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">count_mlist</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+    <span class="c1"># add back subsequences that are not assigned to any groups</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)):</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">matched</span><span class="p">:</span>
+        <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="n">i</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]]])</span>
+    
+    <span class="c1">#compute id </span>
+    <span class="n">id_groups</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_g</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
+      <span class="n">id_s</span><span class="p">,</span> <span class="n">score_max</span> <span class="o">=</span> <span class="n">compute_group_id</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">)</span>
+      <span class="n">id_groups</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">id_s</span><span class="p">,</span><span class="n">score_max</span><span class="p">])</span>
+    
+    <span class="c1"># check id duplicate, if two group has the same id, then we need to devide which group to keep its id, other group to have the id remove</span>
+    <span class="n">sseq_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">sseq_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sseq_id</span> <span class="ow">in</span> <span class="n">id_groups</span><span class="p">]</span>
+    <span class="n">dup</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sseq_ids</span> <span class="k">if</span> <span class="n">sseq_ids</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">be_merged</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">dup_i</span> <span class="o">=</span> <span class="n">dup</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">sseq_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">id_groups</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">be_merged</span><span class="p">:</span>
+          <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">sseq_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">id_groups</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">be_merged</span><span class="p">:</span>
+            <span class="k">continue</span>
+          <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">j</span> <span class="ow">and</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">dup_i</span> <span class="ow">and</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">dup_i</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">check_overlap_gps</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">)</span> <span class="ow">and</span> \
+               <span class="n">check_jump_gps</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">,</span> <span class="n">camchange</span><span class="p">):</span>
+               <span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="n">merge_group</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">overlap_thres</span><span class="p">)</span>
+               <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+               <span class="n">be_merged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+              <span class="c1"># calculate the length of subsequnce i and j</span>
+              <span class="n">len_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">subsequences</span><span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]))])</span>
+              <span class="n">len_j</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">subsequences</span><span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">jj</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">]))])</span>
+              <span class="k">if</span> <span class="n">len_i</span> <span class="o">&lt;</span> <span class="n">len_j</span> <span class="ow">and</span> <span class="n">len_i</span> <span class="o">&lt;</span> <span class="n">len_thres</span><span class="p">:</span> <span class="c1">#if subsequnce i is shorter than j and i is shorter than len_thres, set its id to 0</span>
+                <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+              <span class="k">elif</span> <span class="n">len_j</span> <span class="o">&lt;</span> <span class="n">len_i</span> <span class="ow">and</span> <span class="n">len_j</span> <span class="o">&lt;</span> <span class="n">len_thres</span><span class="p">:</span>  <span class="c1">#if subsequnce j is shorter than i and j is shorter than len_thres, set its id to 0</span>
+                <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+              <span class="k">elif</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># set the subsequnce with lower score to 0</span>
+                <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+              <span class="k">else</span><span class="p">:</span>
+                <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">be_merged</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">be_merged</span><span class="p">]</span>
+      <span class="n">id_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_group</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">id_group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">id_groups</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">be_merged</span><span class="p">]</span>
+    
+    <span class="c1"># compute the cap triplet feature for each group</span>
+    <span class="n">group_feats</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+      <span class="n">avg_feat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">triplet_mean_seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+      <span class="n">frm_no</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="n">avg_feat</span> <span class="o">+=</span> <span class="n">triplet_mean_seq</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">frm_no</span> <span class="o">+=</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">group_feats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_feat</span><span class="o">/</span><span class="n">frm_no</span><span class="p">)</span>
+
+    <span class="n">be_merged</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1">#add last connection by nearest triplet cap feature for each group</span>
+    <span class="c1"># this function was originally using histogram. But now it has switched to triplet features</span>
+    <span class="n">ind_new</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="n">track</span><span class="p">]</span><span class="o">.</span><span class="n">scn_max</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">sseq_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">id_groups</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">score_hist_best</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">score_hist_second</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">selected_j</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">length_selected_j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">length_i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+          <span class="n">length_i</span> <span class="o">+=</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">length_i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+          <span class="k">continue</span>
+
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
+          <span class="n">length_j</span> <span class="o">=</span> <span class="mi">0</span>
+          <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">])):</span>
+            <span class="n">length_j</span> <span class="o">+=</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">jj</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+          <span class="c1">#if length_j &lt; </span>
+          <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="n">track</span><span class="p">]</span><span class="o">.</span><span class="n">scn_max</span> <span class="ow">and</span> \
+            <span class="n">check_overlap_gps</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> \
+            <span class="n">check_jump_gps</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">,</span> <span class="n">camchange</span><span class="p">):</span>   <span class="c1">#thres = 3 strict</span>
+              <span class="n">score</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">group_feats</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">group_feats</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+              <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">score_hist_best</span><span class="p">:</span>
+                <span class="n">score_hist_second</span> <span class="o">=</span> <span class="n">score_hist_best</span>
+                <span class="n">score_hist_best</span> <span class="o">=</span> <span class="n">score</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">triplet_thres_gp</span><span class="p">:</span> <span class="c1"># 0.6 0.55</span>
+                  <span class="n">selected_j</span> <span class="o">=</span> <span class="n">j</span>
+                  <span class="n">length_selected_j</span> <span class="o">=</span> <span class="n">length_j</span>
+              <span class="k">elif</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">score_hist_second</span><span class="p">:</span>
+                <span class="n">score_hist_second</span> <span class="o">=</span> <span class="n">score</span>
+
+        <span class="k">if</span> <span class="n">selected_j</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">score_hist_second</span> <span class="o">/</span> <span class="n">score_hist_best</span> <span class="o">&lt;</span> <span class="mf">0.8</span> <span class="ow">and</span> <span class="n">length_selected_j</span> <span class="o">&gt;</span> <span class="n">len_thres</span><span class="p">:</span>
+          <span class="n">groups</span><span class="p">[</span><span class="n">selected_j</span><span class="p">]</span>  <span class="o">=</span> <span class="n">merge_group</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">selected_j</span><span class="p">],</span> <span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">overlap_thres</span><span class="p">)</span>
+          <span class="n">id_groups</span><span class="p">[</span><span class="n">selected_j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+          <span class="n">be_merged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+          <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;merge by group triplet, dist = &#39;</span><span class="p">,</span> <span class="n">score_hist_best</span><span class="p">,</span> <span class="n">score_hist_second</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">length_i</span><span class="p">,</span> <span class="n">length_selected_j</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">ind_new</span> <span class="o">+=</span> <span class="mi">1</span>
+          <span class="n">id_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind_new</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">be_merged</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">be_merged</span><span class="p">]</span>
+      <span class="n">id_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_group</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">id_group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">id_groups</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">be_merged</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">groups</span><span class="p">,</span> <span class="n">id_groups</span></div>
+
+
+<div class="viewcode-block" id="check_overlap_gps"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.check_overlap_gps">[docs]</a><span class="k">def</span> <span class="nf">check_overlap_gps</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">sqs</span><span class="p">,</span> <span class="n">dc</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  This function checks whether the two groups of subsequnces can be merged together.</span>
+<span class="sd">  It will loop over the subsequences in both groups one by one to see if there is any overlapping or switching between them.</span>
+<span class="sd">  the merging will be rejected if any of these cases happen.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="k">for</span> <span class="n">m1</span> <span class="ow">in</span> <span class="n">g1</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">m2</span> <span class="ow">in</span> <span class="n">g2</span><span class="p">:</span>
+      <span class="n">overlap_set</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sqs</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m1</span><span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="mi">0</span><span class="p">,:])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sqs</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="mi">0</span><span class="p">,:])))</span>
+      <span class="n">overlap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m1</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m1</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span>
+      <span class="n">overlap_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span>
+      
+      <span class="c1"># if the overlap of subsequences is greater than the threshold t, over if the overlap length equals the length of either subsequence, return False, (group should not be joint together)</span>
+      <span class="k">if</span> <span class="n">overlap_length</span> <span class="o">&gt;</span> <span class="n">t</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">sqs</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m1</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap_set</span><span class="p">)</span> <span class="o">==</span> <span class="n">sqs</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+          
+  <span class="c1"># if nothing wrong, approve the merge of the two groups</span>
+  <span class="k">return</span> <span class="kc">True</span></div>
+  
+<div class="viewcode-block" id="merge_group"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.merge_group">[docs]</a><span class="k">def</span> <span class="nf">merge_group</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;merge the two groups, insert subsequences of group 2 one by one into group 1&#39;&#39;&#39;</span>
+
+  <span class="k">for</span> <span class="n">m2</span> <span class="ow">in</span> <span class="n">g2</span><span class="p">:</span>
+    <span class="n">inserted</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">mid</span><span class="p">,</span> <span class="n">m1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">g1</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">m2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">m1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">g1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span>
+        <span class="n">inserted</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">break</span>
+    <span class="k">if</span> <span class="n">inserted</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">g1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m2</span><span class="p">)</span>
+      
+  <span class="k">return</span> <span class="n">g1</span></div>
+
+<div class="viewcode-block" id="compute_group_id"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.compute_group_id">[docs]</a><span class="k">def</span> <span class="nf">compute_group_id</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">subseq_ids_scores</span><span class="p">,</span> <span class="n">jockeys</span><span class="p">,</span> <span class="n">track</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  compute the jockey id for the group, and the score of the id</span>
+<span class="sd">  </span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">id_gp</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">id_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">lst_score</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="n">track</span><span class="p">]</span><span class="o">.</span><span class="n">scn_max</span>
+  <span class="k">for</span> <span class="n">sq</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+    <span class="n">id_tmp</span> <span class="o">=</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">score_tmp</span> <span class="o">=</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">id_tmp</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">id_tmp</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="n">lst_score</span><span class="p">[</span><span class="n">id_tmp</span><span class="p">]</span> <span class="o">+=</span> <span class="n">score_tmp</span>
+
+  <span class="n">lst_score_neg</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">lst</span> <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">lst_score</span><span class="p">]</span>
+  <span class="n">arg_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lst_score_neg</span><span class="p">)))</span>
+  <span class="n">lst_score</span> <span class="o">=</span> <span class="p">[</span><span class="n">lst_score</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">arg_list</span><span class="p">]</span>
+
+  <span class="k">if</span> <span class="n">lst_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">id_gp</span> <span class="o">=</span> <span class="n">arg_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">id_score</span> <span class="o">=</span> <span class="n">lst_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">lst_score</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">id_score</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">id_gp</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jockeys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id_gp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">jockeys</span><span class="p">:</span>
+      <span class="n">id_gp</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="n">id_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">return</span> <span class="n">id_gp</span><span class="p">,</span> <span class="n">id_score</span></div>
+
+<div class="viewcode-block" id="sort_list_by_col"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.sort_list_by_col">[docs]</a><span class="k">def</span> <span class="nf">sort_list_by_col</span><span class="p">(</span><span class="n">mylist</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;sort the list based on the scores of the subsequence pairs&#39;&#39;&#39;</span>
+  <span class="n">len_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mylist</span><span class="p">]</span>
+  <span class="n">arg_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">len_list</span><span class="p">)))</span>
+  <span class="n">mylist</span> <span class="o">=</span> <span class="p">[</span><span class="n">mylist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">arg_list</span><span class="p">]</span>
+  <span class="n">mylist</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">mylist</span></div>
+
+<div class="viewcode-block" id="check_jump_seqs"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.check_jump_seqs">[docs]</a><span class="k">def</span> <span class="nf">check_jump_seqs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sqs</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">):</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  check whether the subsequence has jumping too fast in time</span>
+<span class="sd">  Normally, when the race progress from frame t to frame t+n. The jockey cap will gradrally move from the spatial position at t to the new position at t+n.</span>
+<span class="sd">  Therefore, if we are connecting the cap between frame t and frame t+n, if n is small, the distance moved of the cap should be small. And such a distance gradually increases, as n becomes larger.</span>
+<span class="sd">  This function will reject subsequence matching with unexpectedly large spatial displacement of the caps.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="n">dist</span> <span class="o">=</span> <span class="mf">0.0</span>
+  <span class="n">dist_thres</span> <span class="o">=</span> <span class="mf">0.8</span>
+  <span class="n">dist_thres_low</span> <span class="o">=</span> <span class="mf">0.3</span>
+  <span class="n">a_start_ifrm</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">a_start_icap</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">a_end_ifrm</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="n">sqs</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">a_end_icap</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="n">sqs</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">a_stard_box</span> <span class="o">=</span> <span class="n">detected_boxes</span><span class="p">[</span><span class="n">a_start_ifrm</span><span class="p">][</span><span class="n">a_start_icap</span><span class="p">]</span>
+  <span class="n">a_end_box</span> <span class="o">=</span> <span class="n">detected_boxes</span><span class="p">[</span><span class="n">a_end_ifrm</span><span class="p">][</span><span class="n">a_end_icap</span><span class="p">]</span>
+
+  <span class="n">b_start_ifrm</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">b_start_icap</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">b_end_ifrm</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="n">sqs</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">b_end_icap</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="n">sqs</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">b_stard_box</span> <span class="o">=</span> <span class="n">detected_boxes</span><span class="p">[</span><span class="n">b_start_ifrm</span><span class="p">][</span><span class="n">b_start_icap</span><span class="p">]</span>
+  <span class="n">b_end_box</span> <span class="o">=</span> <span class="n">detected_boxes</span><span class="p">[</span><span class="n">b_end_ifrm</span><span class="p">][</span><span class="n">b_end_icap</span><span class="p">]</span>
+
+  <span class="n">dt</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a_end_ifrm</span> <span class="o">-</span> <span class="n">b_start_ifrm</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">b_end_ifrm</span> <span class="o">-</span> <span class="n">a_start_ifrm</span><span class="p">))</span>
+  <span class="k">if</span> <span class="n">dt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.5</span>
+  <span class="k">if</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mf">1.0</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">a_end_ifrm</span> <span class="o">-</span> <span class="n">overlap_thres</span> <span class="o">&lt;</span> <span class="n">b_start_ifrm</span><span class="p">):</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">a_end_box</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">b_stard_box</span>
+  <span class="k">elif</span> <span class="p">(</span><span class="n">b_end_ifrm</span> <span class="o">-</span> <span class="n">overlap_thres</span> <span class="o">&lt;</span> <span class="n">a_start_ifrm</span><span class="p">):</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">b_end_box</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">a_stard_box</span>
+  <span class="k">else</span><span class="p">:</span> <span class="c1">#overlap</span>
+    <span class="k">return</span> <span class="mf">0.0</span>
+
+  <span class="n">dist</span> <span class="o">=</span> <span class="p">(((</span><span class="n">b1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b1</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">b2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">b1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b1</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">b2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b2</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+  <span class="n">dist</span> <span class="o">/=</span> <span class="p">((</span><span class="n">b1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">b1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">b1</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">b1</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">**</span> <span class="mf">0.5</span>    <span class="c1">#box w and h should not be zero</span>
+  <span class="n">dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">dist</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span>   <span class="c1"># add -1 to make more tolerent to t = 1 2 3</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">dist</span> <span class="o">&gt;</span> <span class="n">dist_thres</span><span class="p">):</span>    <span class="c1"># dist_thres = 2.0;  sigma ~ 0.15</span>
+    <span class="k">return</span> <span class="mf">0.0</span>
+
+  <span class="n">st_score</span> <span class="o">=</span> <span class="mf">1.0</span>
+  <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">dist_thres_low</span><span class="p">:</span>
+    <span class="n">st_score</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">dist</span> <span class="o">-</span> <span class="n">dist_thres_low</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">st_score</span></div>
+
+
+<span class="c1">#True if no jumping</span>
+<div class="viewcode-block" id="check_jump_gps"><a class="viewcode-back" href="../../Tracking.html#Tracking.final_tracking.check_jump_gps">[docs]</a><span class="k">def</span> <span class="nf">check_jump_gps</span><span class="p">(</span><span class="n">gp1</span><span class="p">,</span> <span class="n">gp2</span><span class="p">,</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">,</span> <span class="n">camchange</span><span class="p">):</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  check whether there is any jumping for subsequence pairs in subrace</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="n">num_subrace</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">camchange</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="n">subraces</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_subrace</span><span class="p">)]</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">camchange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">subraces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)]</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">subraces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">camchange</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="k">if</span> <span class="n">num_subrace</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">subraces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">camchange</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_subrace</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+      <span class="n">subraces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">camchange</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">camchange</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+  <span class="k">for</span> <span class="n">m1</span> <span class="ow">in</span> <span class="n">gp1</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">m2</span> <span class="ow">in</span> <span class="n">gp2</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">subrace</span> <span class="ow">in</span> <span class="n">subraces</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">m1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">subrace</span> <span class="ow">and</span> <span class="n">m2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">subrace</span><span class="p">:</span>
+          <span class="c1">#only check if two seqs in same subrace</span>
+          <span class="k">if</span> <span class="n">check_jump_seqs</span><span class="p">(</span><span class="n">m1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">,</span> <span class="n">detected_boxes</span><span class="p">,</span> <span class="n">overlap_thres</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+  <span class="k">return</span> <span class="kc">True</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

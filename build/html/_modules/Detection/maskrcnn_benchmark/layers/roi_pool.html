@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detection.maskrcnn_benchmark.layers.roi_pool &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Detection.maskrcnn_benchmark.layers.roi_pool</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Detection.maskrcnn_benchmark.layers.roi_pool</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Function</span>
+<span class="kn">from</span> <span class="nn">torch.autograd.function</span> <span class="kn">import</span> <span class="n">once_differentiable</span>
+<span class="kn">from</span> <span class="nn">torch.nn.modules.utils</span> <span class="kn">import</span> <span class="n">_pair</span>
+
+<span class="kn">from</span> <span class="nn">maskrcnn_benchmark</span> <span class="kn">import</span> <span class="n">_C</span>
+
+
+<span class="k">class</span> <span class="nc">_ROIPool</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">spatial_scale</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">_pair</span><span class="p">(</span><span class="n">output_size</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">spatial_scale</span> <span class="o">=</span> <span class="n">spatial_scale</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">argmax</span> <span class="o">=</span> <span class="n">_C</span><span class="o">.</span><span class="n">roi_pool_forward</span><span class="p">(</span>
+            <span class="nb">input</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">spatial_scale</span><span class="p">,</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">argmax</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@once_differentiable</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="nb">input</span><span class="p">,</span> <span class="n">rois</span><span class="p">,</span> <span class="n">argmax</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+        <span class="n">output_size</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">output_size</span>
+        <span class="n">spatial_scale</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">spatial_scale</span>
+        <span class="n">bs</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">input_shape</span>
+        <span class="n">grad_input</span> <span class="o">=</span> <span class="n">_C</span><span class="o">.</span><span class="n">roi_pool_backward</span><span class="p">(</span>
+            <span class="n">grad_output</span><span class="p">,</span>
+            <span class="nb">input</span><span class="p">,</span>
+            <span class="n">rois</span><span class="p">,</span>
+            <span class="n">argmax</span><span class="p">,</span>
+            <span class="n">spatial_scale</span><span class="p">,</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">bs</span><span class="p">,</span>
+            <span class="n">ch</span><span class="p">,</span>
+            <span class="n">h</span><span class="p">,</span>
+            <span class="n">w</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">grad_input</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="n">roi_pool</span> <span class="o">=</span> <span class="n">_ROIPool</span><span class="o">.</span><span class="n">apply</span>
+
+
+<div class="viewcode-block" id="ROIPool"><a class="viewcode-back" href="../../../../Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.roi_pool.ROIPool">[docs]</a><span class="k">class</span> <span class="nc">ROIPool</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">spatial_scale</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ROIPool</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spatial_scale</span> <span class="o">=</span> <span class="n">spatial_scale</span>
+
+<div class="viewcode-block" id="ROIPool.forward"><a class="viewcode-back" href="../../../../Detection.maskrcnn_benchmark.layers.html#Detection.maskrcnn_benchmark.layers.roi_pool.ROIPool.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">rois</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">roi_pool</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">rois</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_scale</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tmpstr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
+        <span class="n">tmpstr</span> <span class="o">+=</span> <span class="s2">&quot;output_size=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">)</span>
+        <span class="n">tmpstr</span> <span class="o">+=</span> <span class="s2">&quot;, spatial_scale=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spatial_scale</span><span class="p">)</span>
+        <span class="n">tmpstr</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+        <span class="k">return</span> <span class="n">tmpstr</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

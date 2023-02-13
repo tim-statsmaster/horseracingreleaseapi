@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>config module &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="main module" href="main.html" />
+    <link rel="prev" title="Tracking.initial_tracking module" href="Tracking.initial_tracking.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">horseracing-v2.4</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Detection.html">Detection package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GCNClustering.html">GCNClustering package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SceneClassifier.html">SceneClassifier package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Segmentation.html">Segmentation package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tracking.html">Tracking package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">config module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config.HVTConfig"><code class="docutils literal notranslate"><span class="pre">HVTConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#config.HVTConfig.conn_thres"><code class="docutils literal notranslate"><span class="pre">HVTConfig.conn_thres</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.HVTConfig.scn_max"><code class="docutils literal notranslate"><span class="pre">HVTConfig.scn_max</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#config.KranjiConfig"><code class="docutils literal notranslate"><span class="pre">KranjiConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#config.KranjiConfig.conn_thres"><code class="docutils literal notranslate"><span class="pre">KranjiConfig.conn_thres</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.KranjiConfig.scn_max"><code class="docutils literal notranslate"><span class="pre">KranjiConfig.scn_max</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#config.STAWTConfig"><code class="docutils literal notranslate"><span class="pre">STAWTConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#config.STAWTConfig.conn_thres"><code class="docutils literal notranslate"><span class="pre">STAWTConfig.conn_thres</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.STAWTConfig.scn_max"><code class="docutils literal notranslate"><span class="pre">STAWTConfig.scn_max</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#config.STTConfig"><code class="docutils literal notranslate"><span class="pre">STTConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#config.STTConfig.conn_thres"><code class="docutils literal notranslate"><span class="pre">STTConfig.conn_thres</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.STTConfig.scn_max"><code class="docutils literal notranslate"><span class="pre">STTConfig.scn_max</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#config.Task"><code class="docutils literal notranslate"><span class="pre">Task</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.DETECTION"><code class="docutils literal notranslate"><span class="pre">Task.DETECTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.FRAMEEXTRACTOR"><code class="docutils literal notranslate"><span class="pre">Task.FRAMEEXTRACTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.OPTICALFLOW"><code class="docutils literal notranslate"><span class="pre">Task.OPTICALFLOW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.RAILMASK"><code class="docutils literal notranslate"><span class="pre">Task.RAILMASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.RAILPOLEMASK"><code class="docutils literal notranslate"><span class="pre">Task.RAILPOLEMASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.SCENECLASSIFY"><code class="docutils literal notranslate"><span class="pre">Task.SCENECLASSIFY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.SEMANTICMASK"><code class="docutils literal notranslate"><span class="pre">Task.SEMANTICMASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config.Task.TRACKING"><code class="docutils literal notranslate"><span class="pre">Task.TRACKING</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#config.get_model_info"><code class="docutils literal notranslate"><span class="pre">get_model_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#config.get_model_paths"><code class="docutils literal notranslate"><span class="pre">get_model_paths()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">horseracing-v2.4</a></li>
+      <li class="breadcrumb-item active">config module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-config">
+<span id="config-module"></span><h1>config module<a class="headerlink" href="#module-config" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="config.HVTConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">HVTConfig</span></span><a class="reference internal" href="_modules/config.html#HVTConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.HVTConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.HVTConfig.conn_thres">
+<span class="sig-name descname"><span class="pre">conn_thres</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#config.HVTConfig.conn_thres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.HVTConfig.scn_max">
+<span class="sig-name descname"><span class="pre">scn_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#config.HVTConfig.scn_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="config.KranjiConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">KranjiConfig</span></span><a class="reference internal" href="_modules/config.html#KranjiConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.KranjiConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.KranjiConfig.conn_thres">
+<span class="sig-name descname"><span class="pre">conn_thres</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#config.KranjiConfig.conn_thres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.KranjiConfig.scn_max">
+<span class="sig-name descname"><span class="pre">scn_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#config.KranjiConfig.scn_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="config.STAWTConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">STAWTConfig</span></span><a class="reference internal" href="_modules/config.html#STAWTConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.STAWTConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.STAWTConfig.conn_thres">
+<span class="sig-name descname"><span class="pre">conn_thres</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#config.STAWTConfig.conn_thres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.STAWTConfig.scn_max">
+<span class="sig-name descname"><span class="pre">scn_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#config.STAWTConfig.scn_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="config.STTConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">STTConfig</span></span><a class="reference internal" href="_modules/config.html#STTConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.STTConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.STTConfig.conn_thres">
+<span class="sig-name descname"><span class="pre">conn_thres</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#config.STTConfig.conn_thres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.STTConfig.scn_max">
+<span class="sig-name descname"><span class="pre">scn_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#config.STTConfig.scn_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="config.Task">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">Task</span></span><a class="reference internal" href="_modules/config.html#Task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.Task" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.DETECTION">
+<span class="sig-name descname"><span class="pre">DETECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#config.Task.DETECTION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.FRAMEEXTRACTOR">
+<span class="sig-name descname"><span class="pre">FRAMEEXTRACTOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#config.Task.FRAMEEXTRACTOR" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.OPTICALFLOW">
+<span class="sig-name descname"><span class="pre">OPTICALFLOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#config.Task.OPTICALFLOW" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.RAILMASK">
+<span class="sig-name descname"><span class="pre">RAILMASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#config.Task.RAILMASK" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.RAILPOLEMASK">
+<span class="sig-name descname"><span class="pre">RAILPOLEMASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#config.Task.RAILPOLEMASK" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.SCENECLASSIFY">
+<span class="sig-name descname"><span class="pre">SCENECLASSIFY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#config.Task.SCENECLASSIFY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.SEMANTICMASK">
+<span class="sig-name descname"><span class="pre">SEMANTICMASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#config.Task.SEMANTICMASK" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Task.TRACKING">
+<span class="sig-name descname"><span class="pre">TRACKING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#config.Task.TRACKING" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="config.get_model_info">
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">get_model_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config.html#get_model_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.get_model_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="config.get_model_paths">
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">get_model_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config.html#get_model_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.get_model_paths" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Tracking.initial_tracking.html" class="btn btn-neutral float-left" title="Tracking.initial_tracking module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="main.html" class="btn btn-neutral float-right" title="main module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

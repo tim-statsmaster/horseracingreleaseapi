@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detection.maskrcnn_benchmark.utils.model_zoo &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Detection.maskrcnn_benchmark.utils.model_zoo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Detection.maskrcnn_benchmark.utils.model_zoo</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">_download_url_to_file</span>
+<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">HASH_REGEX</span>
+
+<span class="kn">from</span> <span class="nn">maskrcnn_benchmark.utils.comm</span> <span class="kn">import</span> <span class="n">is_main_process</span>
+<span class="kn">from</span> <span class="nn">maskrcnn_benchmark.utils.comm</span> <span class="kn">import</span> <span class="n">synchronize</span>
+
+
+<span class="c1"># very similar to https://github.com/pytorch/pytorch/blob/master/torch/utils/model_zoo.py</span>
+<span class="c1"># but with a few improvements and modifications</span>
+<div class="viewcode-block" id="cache_url"><a class="viewcode-back" href="../../../../Detection.maskrcnn_benchmark.utils.html#Detection.maskrcnn_benchmark.utils.model_zoo.cache_url">[docs]</a><span class="k">def</span> <span class="nf">cache_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">model_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loads the Torch serialized object at the given URL.</span>
+<span class="sd">    If the object is already present in `model_dir`, it&#39;s deserialized and</span>
+<span class="sd">    returned. The filename part of the URL should follow the naming convention</span>
+<span class="sd">    ``filename-&lt;sha256&gt;.ext`` where ``&lt;sha256&gt;`` is the first eight or more</span>
+<span class="sd">    digits of the SHA256 hash of the contents of the file. The hash is used to</span>
+<span class="sd">    ensure unique names and to verify the contents of the file.</span>
+<span class="sd">    The default value of `model_dir` is ``$TORCH_HOME/models`` where</span>
+<span class="sd">    ``$TORCH_HOME`` defaults to ``~/.torch``. The default directory can be</span>
+<span class="sd">    overridden with the ``$TORCH_MODEL_ZOO`` environment variable.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        url (string): URL of the object to download</span>
+<span class="sd">        model_dir (string, optional): directory in which to save the object</span>
+<span class="sd">        progress (bool, optional): whether or not to display a progress bar to stderr</span>
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; cached_file = maskrcnn_benchmark.utils.model_zoo.cache_url(&#39;https://s3.amazonaws.com/pytorch/models/resnet18-5c106cde.pth&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">torch_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;TORCH_HOME&#39;</span><span class="p">,</span> <span class="s1">&#39;~/.torch&#39;</span><span class="p">))</span>
+        <span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;TORCH_MODEL_ZOO&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">torch_home</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">parts</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s2">&quot;model_final.pkl&quot;</span><span class="p">:</span>
+        <span class="c1"># workaround as pre-trained Caffe2 models from Detectron have all the same filename</span>
+        <span class="c1"># so make the full path the filename by replacing / with _</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">cached_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cached_file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_main_process</span><span class="p">():</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Downloading: &quot;</span><span class="si">{}</span><span class="s1">&quot; to </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">cached_file</span><span class="p">))</span>
+        <span class="n">hash_prefix</span> <span class="o">=</span> <span class="n">HASH_REGEX</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hash_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hash_prefix</span> <span class="o">=</span> <span class="n">hash_prefix</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># workaround: Caffe2 models don&#39;t have a hash, but follow the R-50 convention,</span>
+            <span class="c1"># which matches the hash PyTorch uses. So we skip the hash matching</span>
+            <span class="c1"># if the hash_prefix is less than 6 characters</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hash_prefix</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="n">hash_prefix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">_download_url_to_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">cached_file</span><span class="p">,</span> <span class="n">hash_prefix</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+    <span class="n">synchronize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cached_file</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

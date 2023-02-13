@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracking.final_tracking module &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tracking.find_trajectories module" href="Tracking.find_trajectories.html" />
+    <link rel="prev" title="Tracking package" href="Tracking.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">horseracing-v2.4</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Detection.html">Detection package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GCNClustering.html">GCNClustering package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SceneClassifier.html">SceneClassifier package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Segmentation.html">Segmentation package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Tracking.html">Tracking package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="Tracking.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Tracking.final_tracking module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Tracking.find_trajectories.html">Tracking.find_trajectories module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Tracking.initial_tracking.html">Tracking.initial_tracking module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Tracking.html#module-Tracking">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">horseracing-v2.4</a></li>
+          <li class="breadcrumb-item"><a href="Tracking.html">Tracking package</a></li>
+      <li class="breadcrumb-item active">Tracking.final_tracking module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Tracking.final_tracking.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-Tracking.final_tracking">
+<span id="tracking-final-tracking-module"></span><h1>Tracking.final_tracking module<a class="headerlink" href="#module-Tracking.final_tracking" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.check_jump_gps">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">check_jump_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detected_boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camchange</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#check_jump_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.check_jump_gps" title="Permalink to this definition"></a></dt>
+<dd><p>check whether there is any jumping for subsequence pairs in subrace</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.check_jump_seqs">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">check_jump_seqs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detected_boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_thres</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#check_jump_seqs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.check_jump_seqs" title="Permalink to this definition"></a></dt>
+<dd><p>check whether the subsequence has jumping too fast in time
+Normally, when the race progress from frame t to frame t+n. The jockey cap will gradrally move from the spatial position at t to the new position at t+n.
+Therefore, if we are connecting the cap between frame t and frame t+n, if n is small, the distance moved of the cap should be small. And such a distance gradually increases, as n becomes larger.
+This function will reject subsequence matching with unexpectedly large spatial displacement of the caps.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.check_overlap_gps">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">check_overlap_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#check_overlap_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.check_overlap_gps" title="Permalink to this definition"></a></dt>
+<dd><p>This function checks whether the two groups of subsequnces can be merged together.
+It will loop over the subsequences in both groups one by one to see if there is any overlapping or switching between them.
+the merging will be rejected if any of these cases happen.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.compute_group_id">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">compute_group_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subseq_ids_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jockeys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#compute_group_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.compute_group_id" title="Permalink to this definition"></a></dt>
+<dd><p>compute the jockey id for the group, and the score of the id</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.match_with_triplet_saddlecloth">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">match_with_triplet_saddlecloth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subsequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subseq_ids_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_features_caps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_features_jockeys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jockey_cap_relation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detected_boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camchange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jockeys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#match_with_triplet_saddlecloth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.match_with_triplet_saddlecloth" title="Permalink to this definition"></a></dt>
+<dd><p>This function performs the following functions
+1) divides the subsequences into different subraces
+2) compute the mean triplet cap and jockey features for each subsequences
+3) use the triplet thresholds, triplet features, saddlecloth scores, saddlecloth thresholds to pair up the subsequences
+4) the paired up subsequences are separated into batches “matchlist_step” in terms of priority
+5) using the pair of subsequences to form group of subsequences that belongs to the same jockeys
+6) Join the subsequences within the group to form one trajectory</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.merge_group">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">merge_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#merge_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.merge_group" title="Permalink to this definition"></a></dt>
+<dd><p>merge the two groups, insert subsequences of group 2 one by one into group 1</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.search_match_with_id">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">search_match_with_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subseq_ids_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detected_boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camchange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_mean_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jockeys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#search_match_with_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.search_match_with_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.final_tracking.sort_list_by_col">
+<span class="sig-prename descclassname"><span class="pre">Tracking.final_tracking.</span></span><span class="sig-name descname"><span class="pre">sort_list_by_col</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mylist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/final_tracking.html#sort_list_by_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.final_tracking.sort_list_by_col" title="Permalink to this definition"></a></dt>
+<dd><p>sort the list based on the scores of the subsequence pairs</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Tracking.html" class="btn btn-neutral float-left" title="Tracking package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Tracking.find_trajectories.html" class="btn btn-neutral float-right" title="Tracking.find_trajectories module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

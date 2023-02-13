@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracking.initial_tracking module &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="config module" href="config.html" />
+    <link rel="prev" title="Tracking.find_trajectories module" href="Tracking.find_trajectories.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">horseracing-v2.4</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Detection.html">Detection package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GCNClustering.html">GCNClustering package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SceneClassifier.html">SceneClassifier package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Segmentation.html">Segmentation package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Tracking.html">Tracking package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="Tracking.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="Tracking.final_tracking.html">Tracking.final_tracking module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Tracking.find_trajectories.html">Tracking.find_trajectories module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Tracking.initial_tracking module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Tracking.html#module-Tracking">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">horseracing-v2.4</a></li>
+          <li class="breadcrumb-item"><a href="Tracking.html">Tracking package</a></li>
+      <li class="breadcrumb-item active">Tracking.initial_tracking module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Tracking.initial_tracking.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-Tracking.initial_tracking">
+<span id="tracking-initial-tracking-module"></span><h1>Tracking.initial_tracking module<a class="headerlink" href="#module-Tracking.initial_tracking" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.initial_tracking.break_subsequences">
+<span class="sig-prename descclassname"><span class="pre">Tracking.initial_tracking.</span></span><span class="sig-name descname"><span class="pre">break_subsequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subsequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_features_caps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_features_jockeys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jockey_cap_relation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_trip_thres</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/initial_tracking.html#break_subsequences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.initial_tracking.break_subsequences" title="Permalink to this definition"></a></dt>
+<dd><p>break subsequences</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subsequences</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>2 * n</em><em>)</em><em>.</em>) – n is the number of caps connected in the subsequences. 2 refers to the frame id and cap id</p></li>
+<li><p><strong>selected_results</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>7 * m</em><em>)</em>) – ( f1, f2, cap1_id, cap2_id, dx, dy, score) * num_pairs
+It shows the connection between cap1 from frame1 and cap2 from frame2. dx and dy are not relevant here. score will be important for this function. The smaller the score the better.</p></li>
+<li><p><strong>triplet_features_caps</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>vector</em><em> (</em><em>numpy array</em><em>)</em>) – cap feature for each frame, for each cap</p></li>
+<li><p><strong>triplet_features_jockeys</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>vector</em><em> (</em><em>numpy array</em><em>)</em>) – jockey body feature for each frame, for each jockey body</p></li>
+<li><p><strong>jockey_cap_relation</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>int</em>) – for each frame, for each cap, record the relationship between the cap id and the jockey id</p></li>
+<li><p><strong>break_intervals</strong> (<em>list</em><em> of </em><em>int</em>) – the frame difference to look for when breaking the subsequences. For example, break_intervals == [2,3] means the system will look for the connectivity scores of frame difference == 2 and 3 in the selected_results to break up the subsequences</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>subsequences</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The code will scan through each subsequence, from start to end.
+It finds the connection that has no cost reported in selected_results (meaning the cost is greater than the threshold), then,
+it will check the mean cap and jockey features between the subsequence before and after the break point.
+If the features do not match, it indicates the subsequence has switching and should be broken up into two subsequences.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.initial_tracking.initial_tracking">
+<span class="sig-prename descclassname"><span class="pre">Tracking.initial_tracking.</span></span><span class="sig-name descname"><span class="pre">initial_tracking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subsequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_features_caps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triplet_features_jockeys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jockey_cap_relation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camchange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trip_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subseq_ids_scores</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/initial_tracking.html#initial_tracking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.initial_tracking.initial_tracking" title="Permalink to this definition"></a></dt>
+<dd><p>Initial tracking. Connect the subsequnces wihtin a subrace (portion of the race with no camera change) using the triplet features and the connectivity score.</p>
+<section id="paramters">
+<h2>Paramters<a class="headerlink" href="#paramters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>subsequences<span class="classifier">numpy array of shape (2 * n).</span></dt><dd><p>n is the number of caps connected in the subsequences. 2 refers to the frame id and cap id</p>
+</dd>
+<dt>selected_results<span class="classifier">numpy array of shape (7 * m)</span></dt><dd><p>( f1, f2, cap1_id, cap2_id, dx, dy, score) * num_pairs
+It shows the connection between cap1 from frame1 and cap2 from frame2. dx and dy are not relevant here. score will be important for this function. The smaller the score the better.</p>
+</dd>
+<dt>triplet_features_caps<span class="classifier">list of list of vector (numpy array)</span></dt><dd><p>cap feature for each frame, for each cap</p>
+</dd>
+<dt>triplet_features_jockeys<span class="classifier">list of list of vector (numpy array)</span></dt><dd><p>jockey body feature for each frame, for each jockey body</p>
+</dd>
+<dt>jockey_cap_relation<span class="classifier">list of list of int</span></dt><dd><p>for each frame, for each cap, record the relationship between the cap id and the jockey id</p>
+</dd>
+<dt>camchange<span class="classifier">list of int</span></dt><dd><p>the list of frame id that camera change happens</p>
+</dd>
+<dt>init_intervals<span class="classifier">list of int</span></dt><dd><p>the interval for connecting the subsequneces, usually 2, 3 or 4</p>
+</dd>
+<dt>track<span class="classifier">string</span></dt><dd><p>the track , e.g. Kranji, HVT, STT</p>
+</dd>
+<dt>trip_thres</dt><dd><p>the threshold for cap feature, i.e. only merge subsequences, if their feature distance is below the trip_thres</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function will specifcally looks at the head and tail of the subsequence to determine whether to join</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Tracking.initial_tracking.link_subsequences">
+<span class="sig-prename descclassname"><span class="pre">Tracking.initial_tracking.</span></span><span class="sig-name descname"><span class="pre">link_subsequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Tracking/initial_tracking.html#link_subsequences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Tracking.initial_tracking.link_subsequences" title="Permalink to this definition"></a></dt>
+<dd><p>Link the connected caps pairs into subsequences by simple head-tail linkage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selected_results</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>7 * m</em><em>)</em>) – ( f1, f2, cap1_id, cap2_id, dx, dy, score) * num_pairs
+It shows the connection between cap1 from frame1 and cap2 from frame2. dx and dy are not relevant here.
+We only consider f1, f2, cap1_id, cap2_id for this function</p></li>
+<li><p><strong>time_diff</strong> (<em>int</em>) – frame different between head and tail pair (default is 1)
+It should be correspond to frm_diff_id, t = [1,2,3,4] -&gt; frm_diff_id = [0,1,2,3], now its hard coded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>subsequences</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The code will link the connected caps pairs into subsequences by simple head-tail frame-capid linkage.</p>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Tracking.find_trajectories.html" class="btn btn-neutral float-left" title="Tracking.find_trajectories module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

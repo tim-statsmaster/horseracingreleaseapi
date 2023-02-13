@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SceneClassifier.predict &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SceneClassifier.predict</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SceneClassifier.predict</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="kn">import</span> <span class="nn">config</span>
+<span class="kn">from</span> <span class="nn">.predictor</span> <span class="kn">import</span> <span class="n">SceneClassificationPredictor</span>
+
+<div class="viewcode-block" id="find_start_end_cc"><a class="viewcode-back" href="../../SceneClassifier.html#SceneClassifier.predict.find_start_end_cc">[docs]</a><span class="k">def</span> <span class="nf">find_start_end_cc</span><span class="p">(</span><span class="n">horseracingResult</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Loads scene classificiation models and predict start/end frame + Camera Change from it</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        horseracingResult (object): Storing intermediate Results</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">### Setup variables</span>
+    <span class="n">vid_name</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">processing_vid_name</span>
+    <span class="n">track</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">race_info</span><span class="p">[</span><span class="n">vid_name</span><span class="p">][</span><span class="s2">&quot;track&quot;</span><span class="p">]</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">race_info</span><span class="p">[</span><span class="n">vid_name</span><span class="p">][</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">race_info</span><span class="p">[</span><span class="n">vid_name</span><span class="p">][</span><span class="s2">&quot;course&quot;</span><span class="p">]</span>
+    <span class="n">target_fps</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">get_fps</span><span class="p">(</span><span class="n">vid_name</span><span class="p">)</span> <span class="c1">## 25/30</span>
+
+    <span class="c1">## Find the target video path</span>
+    <span class="n">video_path</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1">### If a path is given in horseracingResult.vid_dir, use it directly</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">vid_dir</span><span class="p">):</span>
+        <span class="n">video_path</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">vid_dir</span>
+    <span class="c1">### Otherwise, find all the videos in that folder</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">format_</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">accepted_formats</span><span class="p">:</span>
+            <span class="n">video_path</span> <span class="o">+=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">vid_dir</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;/*</span><span class="si">{</span><span class="n">format_</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">video_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">video_path</span> <span class="k">if</span> <span class="n">vid_name</span> <span class="ow">in</span> <span class="n">p</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">video_path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">video_path</span> <span class="o">=</span> <span class="n">video_path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">### Load SceneClassification Model and predict</span>
+    <span class="n">encoder_path</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">config</span><span class="o">.</span><span class="n">get_model_paths</span><span class="p">(</span><span class="s2">&quot;SceneClassify&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="s1">&#39;encoder&#39;</span><span class="p">]</span>
+    <span class="n">decoder_path</span> <span class="o">=</span> <span class="n">horseracingResult</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">config</span><span class="o">.</span><span class="n">get_model_paths</span><span class="p">(</span><span class="s2">&quot;SceneClassify&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="s1">&#39;decoder&#39;</span><span class="p">]</span>
+    <span class="n">predictor</span> <span class="o">=</span> <span class="n">SceneClassificationPredictor</span><span class="p">(</span><span class="n">encoder_path</span><span class="p">,</span> <span class="n">decoder_path</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="n">predictor</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">start_frame</span><span class="p">,</span> <span class="n">end_frame</span><span class="p">,</span> <span class="n">cam_change_list</span><span class="p">,</span> <span class="n">cap_fps</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">video_path</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span>
+
+        <span class="c1">## Convert the frame number of the result back to video original fps</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">target_fps</span><span class="o">/</span><span class="n">cap_fps</span>
+        <span class="n">start_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">start_frame</span><span class="o">*</span><span class="n">ratio</span><span class="p">))</span>
+        <span class="n">end_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">end_frame</span><span class="o">*</span><span class="n">ratio</span><span class="p">))</span>
+        <span class="n">cam_change_list</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">ratio</span><span class="p">)),</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">ratio</span><span class="p">))]</span> <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">cam_change_list</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**After converting fps: start: </span><span class="si">{</span><span class="n">start_frame</span><span class="si">}</span><span class="s1"> | end: </span><span class="si">{</span><span class="n">end_frame</span><span class="si">}</span><span class="s1"> | cc: </span><span class="si">{</span><span class="n">cam_change_list</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1">## Set the prediction result (Start/End,Camera Changes) to Result instance</span>
+        <span class="n">horseracingResult</span><span class="o">.</span><span class="n">start_end_frames</span><span class="p">[</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">processing_vid_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_frame</span><span class="p">,</span> <span class="n">end_frame</span><span class="p">]</span>
+        <span class="n">horseracingResult</span><span class="o">.</span><span class="n">cam_changes</span><span class="p">[</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">processing_vid_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cam_change_list</span>
+
+        <span class="c1">### Save Results to vid_process.csv and camera_changes.csv to disk</span>
+        <span class="c1">### Save to video_processor.csv</span>
+        <span class="c1">### Header = raceLabel,track,course,raceDist,md5,fps,coursePred,raceNumPred,raceDistPred,raceTimePred,startFrmNum,finishFrmNum</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">result_dir</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">video_processer_save_path</span><span class="p">),</span> <span class="s2">&quot;a+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">video_preprocess_file</span><span class="p">:</span>
+            <span class="n">vp_result_row</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">vid_name</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">course</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">distance</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target_fps</span><span class="p">),</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">start_frame</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_frame</span><span class="p">)])</span>
+            <span class="n">video_preprocess_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">vp_result_row</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1">### Save to camera_changes.csv</span>
+        <span class="c1">### Header = raceLabel,cc0_start,cc0_end,cc1_start,cc1_end,cc2_start,cc2_end,cc3_start,cc3_end,...</span>
+        <span class="n">cam_change_result_row</span> <span class="o">=</span> <span class="n">vid_name</span>
+        <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">cam_change_list</span><span class="p">:</span>
+            <span class="n">cam_change_result_row</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">cam_change_result_row</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">horseracingResult</span><span class="o">.</span><span class="n">result_dir</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">camerachange_save_path</span><span class="p">),</span> <span class="s2">&quot;a+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cam_change_file</span><span class="p">:</span>
+            <span class="n">cam_change_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cam_change_result_row</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

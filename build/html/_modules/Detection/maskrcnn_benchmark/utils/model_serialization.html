@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detection.maskrcnn_benchmark.utils.model_serialization &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Detection.maskrcnn_benchmark.utils.model_serialization</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Detection.maskrcnn_benchmark.utils.model_serialization</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">maskrcnn_benchmark.utils.imports</span> <span class="kn">import</span> <span class="n">import_file</span>
+
+
+<div class="viewcode-block" id="align_and_update_state_dicts"><a class="viewcode-back" href="../../../../Detection.maskrcnn_benchmark.utils.html#Detection.maskrcnn_benchmark.utils.model_serialization.align_and_update_state_dicts">[docs]</a><span class="k">def</span> <span class="nf">align_and_update_state_dicts</span><span class="p">(</span><span class="n">model_state_dict</span><span class="p">,</span> <span class="n">loaded_state_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Strategy: suppose that the models that we will create will have prefixes appended</span>
+<span class="sd">    to each of its keys, for example due to an extra level of nesting that the original</span>
+<span class="sd">    pre-trained weights from ImageNet won&#39;t contain. For example, model.state_dict()</span>
+<span class="sd">    might return backbone[0].body.res2.conv1.weight, while the pre-trained model contains</span>
+<span class="sd">    res2.conv1.weight. We thus want to match both parameters together.</span>
+<span class="sd">    For that, we look for each model weight, look among all loaded keys if there is one</span>
+<span class="sd">    that is a suffix of the current weight name, and use it if that&#39;s the case.</span>
+<span class="sd">    If multiple matches exist, take the one with longest size</span>
+<span class="sd">    of the corresponding name. For example, for the same model as before, the pretrained</span>
+<span class="sd">    weight file can contain both res2.conv1.weight, as well as conv1.weight. In this case,</span>
+<span class="sd">    we want to match backbone[0].body.conv1.weight to conv1.weight, and</span>
+<span class="sd">    backbone[0].body.res2.conv1.weight to res2.conv1.weight.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">model_state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">loaded_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">loaded_state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="c1"># get a matrix of string matches, where each (i, j) entry correspond to the size of the</span>
+    <span class="c1"># loaded_key string, if it matches</span>
+    <span class="n">match_matrix</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">current_keys</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">loaded_keys</span>
+    <span class="p">]</span>
+    <span class="n">match_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">match_matrix</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">current_keys</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">loaded_keys</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">max_match_size</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="n">match_matrix</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># remove indices that correspond to no-match</span>
+    <span class="n">idxs</span><span class="p">[</span><span class="n">max_match_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="c1"># used for logging</span>
+    <span class="n">max_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current_keys</span><span class="p">])</span> <span class="k">if</span> <span class="n">current_keys</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">max_size_loaded</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_keys</span><span class="p">])</span> <span class="k">if</span> <span class="n">loaded_keys</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">log_str_template</span> <span class="o">=</span> <span class="s2">&quot;{: &lt;</span><span class="si">{}</span><span class="s2">} loaded from {: &lt;</span><span class="si">{}</span><span class="s2">} of shape </span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx_new</span><span class="p">,</span> <span class="n">idx_old</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">idxs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">idx_old</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">current_keys</span><span class="p">[</span><span class="n">idx_new</span><span class="p">]</span>
+        <span class="n">key_old</span> <span class="o">=</span> <span class="n">loaded_keys</span><span class="p">[</span><span class="n">idx_old</span><span class="p">]</span>
+        <span class="n">model_state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded_state_dict</span><span class="p">[</span><span class="n">key_old</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">log_str_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key</span><span class="p">,</span>
+                <span class="n">max_size</span><span class="p">,</span>
+                <span class="n">key_old</span><span class="p">,</span>
+                <span class="n">max_size_loaded</span><span class="p">,</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">loaded_state_dict</span><span class="p">[</span><span class="n">key_old</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="strip_prefix_if_present"><a class="viewcode-back" href="../../../../Detection.maskrcnn_benchmark.utils.html#Detection.maskrcnn_benchmark.utils.model_serialization.strip_prefix_if_present">[docs]</a><span class="k">def</span> <span class="nf">strip_prefix_if_present</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">state_dict</span>
+    <span class="n">stripped_state_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">stripped_state_dict</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">stripped_state_dict</span></div>
+
+
+<div class="viewcode-block" id="load_state_dict"><a class="viewcode-back" href="../../../../Detection.maskrcnn_benchmark.utils.html#Detection.maskrcnn_benchmark.utils.model_serialization.load_state_dict">[docs]</a><span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loaded_state_dict</span><span class="p">):</span>
+    <span class="n">model_state_dict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+    <span class="c1"># if the state_dict comes from a model that was wrapped in a</span>
+    <span class="c1"># DataParallel or DistributedDataParallel during serialization,</span>
+    <span class="c1"># remove the &quot;module&quot; prefix before performing the matching</span>
+    <span class="n">loaded_state_dict</span> <span class="o">=</span> <span class="n">strip_prefix_if_present</span><span class="p">(</span><span class="n">loaded_state_dict</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;module.&quot;</span><span class="p">)</span>
+    <span class="n">align_and_update_state_dicts</span><span class="p">(</span><span class="n">model_state_dict</span><span class="p">,</span> <span class="n">loaded_state_dict</span><span class="p">)</span>
+    <span class="c1"># use strict loading</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model_state_dict</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

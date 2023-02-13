@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors &#8212; HorseRacingRelease 2.4.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/alabaster.css" />
+    <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+
+<div class="viewcode-block" id="FastRCNNPredictor"><a class="viewcode-back" href="../../../../../../Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.html#Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors.FastRCNNPredictor">[docs]</a><span class="k">class</span> <span class="nc">FastRCNNPredictor</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FastRCNNPredictor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">stage_index</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">stage2_relative_factor</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">stage_index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">res2_out_channels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">RESNETS</span><span class="o">.</span><span class="n">RES2_OUT_CHANNELS</span>
+        <span class="n">num_inputs</span> <span class="o">=</span> <span class="n">res2_out_channels</span> <span class="o">*</span> <span class="n">stage2_relative_factor</span>
+
+        <span class="n">num_classes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_BOX_HEAD</span><span class="o">.</span><span class="n">NUM_CLASSES</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avgpool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">AvgPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_inputs</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_inputs</span><span class="p">,</span> <span class="n">num_classes</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FastRCNNPredictor.forward"><a class="viewcode-back" href="../../../../../../Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.html#Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors.FastRCNNPredictor.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avgpool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">cls_logit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">bbox_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls_logit</span><span class="p">,</span> <span class="n">bbox_pred</span></div></div>
+
+
+<div class="viewcode-block" id="FPNPredictor"><a class="viewcode-back" href="../../../../../../Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.html#Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors.FPNPredictor">[docs]</a><span class="k">class</span> <span class="nc">FPNPredictor</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FPNPredictor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">num_classes</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_BOX_HEAD</span><span class="o">.</span><span class="n">NUM_CLASSES</span>
+        <span class="n">representation_size</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_BOX_HEAD</span><span class="o">.</span><span class="n">MLP_HEAD_DIM</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">representation_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">representation_size</span><span class="p">,</span> <span class="n">num_classes</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span><span class="p">]:</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FPNPredictor.forward"><a class="viewcode-back" href="../../../../../../Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.html#Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors.FPNPredictor.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls_score</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">bbox_deltas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_pred</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">bbox_deltas</span></div></div>
+
+
+<span class="n">_ROI_BOX_PREDICTOR</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;FastRCNNPredictor&quot;</span><span class="p">:</span> <span class="n">FastRCNNPredictor</span><span class="p">,</span>
+    <span class="s2">&quot;FPNPredictor&quot;</span><span class="p">:</span> <span class="n">FPNPredictor</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="make_roi_box_predictor"><a class="viewcode-back" href="../../../../../../Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.html#Detection.maskrcnn_benchmark.modeling.roi_heads.box_head.roi_box_predictors.make_roi_box_predictor">[docs]</a><span class="k">def</span> <span class="nf">make_roi_box_predictor</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">_ROI_BOX_PREDICTOR</span><span class="p">[</span><span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_BOX_HEAD</span><span class="o">.</span><span class="n">PREDICTOR</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../index.html">HorseRacingRelease</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Statsmaster Ltd..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

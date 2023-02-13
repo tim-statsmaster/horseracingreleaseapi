@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracking.initial_tracking &mdash; HorseRacingRelease 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HorseRacingRelease
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">horseracing-v2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HorseRacingRelease</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Tracking.initial_tracking</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Tracking.initial_tracking</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">config</span>
+<span class="kn">from</span> <span class="nn">.utils.subsequence</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="link_subsequences"><a class="viewcode-back" href="../../Tracking.html#Tracking.initial_tracking.link_subsequences">[docs]</a><span class="k">def</span> <span class="nf">link_subsequences</span><span class="p">(</span><span class="n">selected_results</span><span class="p">,</span><span class="n">time_diff</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Link the connected caps pairs into subsequences by simple head-tail linkage</span>
+<span class="sd">  </span>
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  selected_results : numpy array of shape (7 * m)</span>
+<span class="sd">    ( f1, f2, cap1_id, cap2_id, dx, dy, score) * num_pairs</span>
+<span class="sd">    It shows the connection between cap1 from frame1 and cap2 from frame2. dx and dy are not relevant here.</span>
+<span class="sd">    We only consider f1, f2, cap1_id, cap2_id for this function</span>
+<span class="sd">  time_diff : int</span>
+<span class="sd">    frame different between head and tail pair (default is 1)</span>
+<span class="sd">    It should be correspond to frm_diff_id, t = [1,2,3,4] -&gt; frm_diff_id = [0,1,2,3], now its hard coded.</span>
+
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">    subsequences</span>
+<span class="sd">  </span>
+<span class="sd">  Note</span>
+<span class="sd">  ----</span>
+<span class="sd">  The code will link the connected caps pairs into subsequences by simple head-tail frame-capid linkage.</span>
+<span class="sd">  </span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="c1">#ti = time.time()</span>
+  <span class="c1"># connect the caps into subsequences using the connectivity score at frame difference == 1</span>
+  <span class="n">subsequences</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">subseq_candidates</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">frm_diff_id</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Use t=1 here</span>
+
+  <span class="c1"># Loop through each selected result,</span>
+  <span class="c1"># selected results&#39; shape here will be (7, N)</span>
+  <span class="c1"># where the 7 parameters are (frm_num_1, frm_num_2, cap1_id, cap2_id, dx, dy, score) </span>
+  <span class="c1"># where N is the number of valid(screened by connectivity threshold) connection pairs in all frames</span>
+  <span class="k">for</span> <span class="n">sr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">frm_diff_id</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="c1"># Initialise the pair infos</span>
+    <span class="n">this_head_frm</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">frm_diff_id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="n">sr</span><span class="p">]</span>
+    <span class="n">this_head_cap_id</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">frm_diff_id</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span><span class="n">sr</span><span class="p">]</span>
+    <span class="n">this_tail_frm</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">frm_diff_id</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="n">sr</span><span class="p">]</span>
+    <span class="n">this_tail_cap_id</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">frm_diff_id</span><span class="p">][</span><span class="mi">3</span><span class="p">,</span><span class="n">sr</span><span class="p">]</span>
+
+    <span class="n">linked</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># Loop through all subseq_candidates, looking to link the current pair to any of it</span>
+    <span class="n">new_subseq_candidates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">kid</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subseq_candidates</span><span class="p">):</span>
+      <span class="n">k_tail_frm</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">k_tail_cap_id</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+      <span class="c1"># We connects the results into subsequence with their head and tail here</span>
+      <span class="c1"># Example: (k_tail_cap_info)frm_2300-capid_0 -&gt; (this_head_cap_info)frm_2301-capid_4</span>
+      <span class="k">if</span> <span class="n">k_tail_frm</span> <span class="o">==</span> <span class="n">this_head_frm</span> <span class="ow">and</span> <span class="n">k_tail_cap_id</span> <span class="o">==</span> <span class="n">this_head_cap_id</span><span class="p">:</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">k</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">this_tail_frm</span><span class="p">,</span>
+                           <span class="n">this_tail_cap_id</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">subseq_candidates</span><span class="p">[</span><span class="n">kid</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">linked</span> <span class="o">=</span> <span class="kc">True</span>
+      <span class="c1"># The selected pairs should be sorted by frame of the head</span>
+      <span class="c1"># If the frame of the head - 1 &gt; the tail of the pair, no chance for further linkage,</span>
+      <span class="c1"># We toss it from subseq_candidates to subsequences here.</span>
+      <span class="k">if</span> <span class="n">k_tail_frm</span> <span class="o">&lt;</span> <span class="n">this_head_frm</span> <span class="o">-</span> <span class="n">time_diff</span><span class="p">:</span>
+        <span class="n">subsequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_subseq_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">subseq_candidates</span> <span class="o">=</span> <span class="n">new_subseq_candidates</span>
+
+    <span class="c1"># If current pair is not linked, create a new subsequence itself</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">linked</span><span class="p">:</span>
+      <span class="c1">### Keep only frm_num_1, frm_num_2, cap1_id, cap2_id here</span>
+      <span class="n">item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="n">this_head_frm</span><span class="p">,</span> <span class="n">this_tail_frm</span><span class="p">],</span>
+                        <span class="p">[</span><span class="n">this_head_cap_id</span><span class="p">,</span> <span class="n">this_tail_cap_id</span><span class="p">]])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+
+      <span class="n">subseq_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+  <span class="n">subsequences</span> <span class="o">+=</span> <span class="n">subseq_candidates</span>
+
+  <span class="k">return</span> <span class="n">subsequences</span></div>
+
+<div class="viewcode-block" id="break_subsequences"><a class="viewcode-back" href="../../Tracking.html#Tracking.initial_tracking.break_subsequences">[docs]</a><span class="k">def</span> <span class="nf">break_subsequences</span><span class="p">(</span><span class="n">subsequences</span><span class="p">,</span> <span class="n">selected_results</span><span class="p">,</span> <span class="n">triplet_features_caps</span><span class="p">,</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="p">,</span> <span class="n">break_intervals</span><span class="p">,</span> <span class="n">break_trip_thres</span><span class="p">):</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  break subsequences</span>
+<span class="sd">  </span>
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  subsequences : numpy array of shape (2 * n). </span>
+<span class="sd">  	n is the number of caps connected in the subsequences. 2 refers to the frame id and cap id</span>
+<span class="sd">  selected_results : numpy array of shape (7 * m)</span>
+<span class="sd">  	( f1, f2, cap1_id, cap2_id, dx, dy, score) * num_pairs</span>
+<span class="sd">  	It shows the connection between cap1 from frame1 and cap2 from frame2. dx and dy are not relevant here. score will be important for this function. The smaller the score the better.</span>
+<span class="sd">  triplet_features_caps : list of list of vector (numpy array)</span>
+<span class="sd">  	cap feature for each frame, for each cap</span>
+<span class="sd">  triplet_features_jockeys : list of list of vector (numpy array)</span>
+<span class="sd">	jockey body feature for each frame, for each jockey body</span>
+<span class="sd">  jockey_cap_relation : list of list of int </span>
+<span class="sd">  	for each frame, for each cap, record the relationship between the cap id and the jockey id  </span>
+<span class="sd">  break_intervals : list of int</span>
+<span class="sd">  	the frame difference to look for when breaking the subsequences. For example, break_intervals == [2,3] means the system will look for the connectivity scores of frame difference == 2 and 3 in the selected_results to break up the subsequences</span>
+<span class="sd">  </span>
+<span class="sd">  Returns</span>
+<span class="sd">  -------</span>
+<span class="sd">  	subsequences</span>
+<span class="sd">  </span>
+<span class="sd">  Note</span>
+<span class="sd">  ----</span>
+<span class="sd">  The code will scan through each subsequence, from start to end.</span>
+<span class="sd">  It finds the connection that has no cost reported in selected_results (meaning the cost is greater than the threshold), then,</span>
+<span class="sd">  it will check the mean cap and jockey features between the subsequence before and after the break point.</span>
+<span class="sd">  If the features do not match, it indicates the subsequence has switching and should be broken up into two subsequences. </span>
+<span class="sd">  </span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="c1"># Cut Sequences with large separation test</span>
+  <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">break_intervals</span><span class="p">:</span>
+    <span class="n">conn_pairs</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Get the connection pairs results of interested time different (t=3) here</span>
+    <span class="k">for</span> <span class="n">sqid</span><span class="p">,</span> <span class="n">sq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">sq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="n">head_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">head_cap_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sq</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">tail_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="n">t</span><span class="p">])</span>
+        <span class="n">tail_cap_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sq</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="n">t</span><span class="p">])</span>
+
+        <span class="n">selector</span> <span class="o">=</span> <span class="p">(</span><span class="n">conn_pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">==</span> <span class="n">head_frame</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">conn_pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">==</span> <span class="n">tail_frame</span><span class="p">)</span> <span class="o">&amp;</span> \
+                   <span class="p">(</span><span class="n">conn_pairs</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">==</span> <span class="n">head_cap_id</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">conn_pairs</span><span class="p">[</span><span class="mi">3</span><span class="p">,:]</span> <span class="o">==</span> <span class="n">tail_cap_id</span><span class="p">)</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">conn_pairs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">selector</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">cost</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        
+          <span class="c1"># compute the average triplet cap feature distance between the subsequences that you would like to break</span>
+          <span class="n">subsequence_before_break_point</span> <span class="o">=</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">sqid</span><span class="p">][:,</span> <span class="n">i</span><span class="o">+</span><span class="n">t</span><span class="p">:]</span>
+          <span class="n">subsequence_after_break_point</span> <span class="o">=</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">sqid</span><span class="p">][:,:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+          <span class="n">cap_tripdist</span> <span class="o">=</span> <span class="n">get_tripdist</span><span class="p">(</span><span class="n">subsequence_before_break_point</span><span class="p">,</span> <span class="n">subsequence_after_break_point</span><span class="p">,</span> <span class="n">triplet_features_caps</span><span class="p">)</span>
+          <span class="n">jockey_tripdist</span> <span class="o">=</span> <span class="n">get_tripdist</span><span class="p">(</span><span class="n">subsequence_before_break_point</span><span class="p">,</span> <span class="n">subsequence_after_break_point</span><span class="p">,</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="o">=</span><span class="n">jockey_cap_relation</span><span class="p">)</span>
+          
+          <span class="c1"># if caps are very different but no matched jockey / both cap and jockey are different, then break</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">cap_tripdist</span> <span class="o">&gt;</span> <span class="n">break_trip_thres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">==</span> <span class="mi">10000</span><span class="p">)</span> <span class="ow">or</span> \
+             <span class="p">(</span><span class="n">cap_tripdist</span> <span class="o">&gt;</span> <span class="n">break_trip_thres</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">&gt;</span> <span class="n">break_trip_thres</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">!=</span> <span class="mi">10000</span><span class="p">):</span>
+            <span class="n">subsequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subsequence_before_break_point</span><span class="p">)</span>
+            <span class="n">subsequences</span><span class="p">[</span><span class="n">sqid</span><span class="p">]</span> <span class="o">=</span> <span class="n">subsequence_after_break_point</span>
+            <span class="k">break</span>
+                
+  <span class="k">return</span> <span class="n">subsequences</span></div>
+  
+  
+<div class="viewcode-block" id="initial_tracking"><a class="viewcode-back" href="../../Tracking.html#Tracking.initial_tracking.initial_tracking">[docs]</a><span class="k">def</span> <span class="nf">initial_tracking</span><span class="p">(</span><span class="n">subsequences</span><span class="p">,</span> <span class="n">selected_results</span><span class="p">,</span> <span class="n">triplet_features_caps</span><span class="p">,</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="p">,</span> <span class="n">camchange</span><span class="p">,</span> <span class="n">init_intervals</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">trip_thres</span><span class="p">,</span> <span class="n">subseq_ids_scores</span><span class="p">):</span>
+
+<span class="w">  </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Initial tracking. Connect the subsequnces wihtin a subrace (portion of the race with no camera change) using the triplet features and the connectivity score.</span>
+<span class="sd">  </span>
+<span class="sd">  Paramters</span>
+<span class="sd">  ---------</span>
+<span class="sd">  subsequences : numpy array of shape (2 * n). </span>
+<span class="sd">  	n is the number of caps connected in the subsequences. 2 refers to the frame id and cap id  </span>
+<span class="sd">  selected_results : numpy array of shape (7 * m)</span>
+<span class="sd">  	( f1, f2, cap1_id, cap2_id, dx, dy, score) * num_pairs</span>
+<span class="sd">  	It shows the connection between cap1 from frame1 and cap2 from frame2. dx and dy are not relevant here. score will be important for this function. The smaller the score the better.</span>
+<span class="sd">  triplet_features_caps : list of list of vector (numpy array)</span>
+<span class="sd">  	cap feature for each frame, for each cap</span>
+<span class="sd">  triplet_features_jockeys : list of list of vector (numpy array)</span>
+<span class="sd">	  jockey body feature for each frame, for each jockey body</span>
+<span class="sd">  jockey_cap_relation : list of list of int </span>
+<span class="sd">  	for each frame, for each cap, record the relationship between the cap id and the jockey id </span>
+<span class="sd">  camchange : list of int</span>
+<span class="sd">  	the list of frame id that camera change happens</span>
+<span class="sd">  init_intervals : list of int</span>
+<span class="sd">  	the interval for connecting the subsequneces, usually 2, 3 or 4</span>
+<span class="sd">  track : string</span>
+<span class="sd">  	the track , e.g. Kranji, HVT, STT</span>
+<span class="sd">  trip_thres</span>
+<span class="sd">  	the threshold for cap feature, i.e. only merge subsequences, if their feature distance is below the trip_thres</span>
+<span class="sd">  </span>
+<span class="sd">  Notes</span>
+<span class="sd">  -----</span>
+<span class="sd">  This function will specifcally looks at the head and tail of the subsequence to determine whether to join</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  
+  <span class="c1"># link the remining with min global t&gt;2 cost, disable linking across cam change</span>
+  <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">init_intervals</span><span class="p">:</span>
+    
+    <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        
+      <span class="n">ssid</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">while</span> <span class="n">ssid</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsequences</span><span class="p">):</span>
+      
+        <span class="n">st_left</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">st_right</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">win</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">diff</span>
+        
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">win</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+          
+          <span class="k">if</span> <span class="n">ssid</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsequences</span><span class="p">):</span>
+            <span class="k">continue</span>
+                              
+          <span class="n">nbrsslft</span> <span class="o">=</span> <span class="p">[</span><span class="n">kid</span> <span class="k">for</span> <span class="n">kid</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">diff</span> <span class="o">==</span> <span class="n">st_left</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">c</span> <span class="ow">and</span> <span class="n">st_left</span> <span class="o">&gt;</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">camchange</span><span class="p">])]</span>
+          <span class="n">nbrssrgt</span> <span class="o">=</span> <span class="p">[</span><span class="n">kid</span> <span class="k">for</span> <span class="n">kid</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">diff</span> <span class="o">==</span> <span class="n">st_right</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">st_right</span> <span class="o">&lt;</span> <span class="n">c</span> <span class="ow">and</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">camchange</span><span class="p">])]</span>
+          
+          <span class="n">best_id_lft</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+          <span class="n">best_id_rgt</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    
+          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbrsslft</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="k">for</span> <span class="n">kid</span> <span class="ow">in</span> <span class="n">nbrsslft</span><span class="p">:</span>
+              
+              <span class="k">if</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">kid</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="o">-</span><span class="n">diff</span><span class="o">-</span><span class="n">w</span> <span class="ow">or</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">w</span><span class="p">:</span>
+                <span class="k">continue</span>
+                                                 
+              <span class="n">f1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">kid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">t</span><span class="o">+</span><span class="n">diff</span><span class="o">+</span><span class="n">w</span><span class="p">])</span>
+              <span class="n">c1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">kid</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">t</span><span class="o">+</span><span class="n">diff</span><span class="o">+</span><span class="n">w</span><span class="p">])</span>
+              <span class="n">f2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="n">w</span><span class="p">])</span>
+              <span class="n">c2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="n">w</span><span class="p">])</span>
+              
+              <span class="n">cost</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,:]</span><span class="o">==</span><span class="n">f1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,:]</span><span class="o">==</span><span class="n">f2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">,:]</span><span class="o">==</span><span class="n">c1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">,:]</span><span class="o">==</span><span class="n">c2</span><span class="p">)]</span>
+              <span class="k">if</span> <span class="n">cost</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+              <span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+              
+              <span class="k">if</span> <span class="n">cost</span> <span class="o">&lt;</span> <span class="n">score</span> <span class="ow">and</span> <span class="n">cost</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="n">track</span><span class="p">]</span><span class="o">.</span><span class="n">conn_thres</span><span class="p">:</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="n">cost</span>
+                <span class="n">best_id_lft</span> <span class="o">=</span> <span class="n">kid</span>
+              
+            <span class="k">if</span> <span class="n">best_id_lft</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            
+              <span class="c1"># triplet test</span>
+              <span class="n">jockey_tripdist</span> <span class="o">=</span> <span class="n">get_tripdist</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">],</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="o">=</span><span class="n">jockey_cap_relation</span><span class="p">)</span>
+              <span class="n">cap_tripdist</span> <span class="o">=</span> <span class="n">get_tripdist</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">][:,:</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">win</span><span class="o">+</span><span class="n">w</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][:,</span><span class="n">w</span><span class="p">:],</span> <span class="n">triplet_features_caps</span><span class="p">)</span>
+
+              <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span> <span class="o">=</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+              <span class="n">dif_num</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">id1</span> <span class="o">!=</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+              <span class="n">same_num</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">id1</span> <span class="o">==</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+
+              <span class="k">if</span> <span class="p">(</span><span class="n">cap_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">same_num</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="n">cap_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">dif_num</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">][:,:</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">win</span><span class="o">+</span><span class="n">w</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][:,</span><span class="n">w</span><span class="p">:]],</span> <span class="mi">1</span><span class="p">)</span>
+              <span class="k">else</span><span class="p">:</span>
+                <span class="n">best_id_lft</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nbrssrgt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="k">for</span> <span class="n">kid</span> <span class="ow">in</span> <span class="n">nbrssrgt</span><span class="p">:</span>
+            
+              <span class="k">if</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">kid</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="o">-</span><span class="n">diff</span><span class="o">-</span><span class="n">w</span> <span class="ow">or</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">w</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+              <span class="n">f1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">w</span><span class="p">])</span>
+              <span class="n">c1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">w</span><span class="p">])</span>
+              <span class="n">f2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">kid</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="n">t</span><span class="o">-</span><span class="n">diff</span><span class="o">-</span><span class="n">w</span><span class="p">])</span>
+              <span class="n">c2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">kid</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="n">t</span><span class="o">-</span><span class="n">diff</span><span class="o">-</span><span class="n">w</span><span class="p">])</span>
+
+              <span class="n">cost</span> <span class="o">=</span> <span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,:]</span><span class="o">==</span><span class="n">f1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,:]</span><span class="o">==</span><span class="n">f2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">,:]</span><span class="o">==</span><span class="n">c1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">selected_results</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">,:]</span><span class="o">==</span><span class="n">c2</span><span class="p">)]</span>
+              <span class="k">if</span> <span class="n">cost</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+              <span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+              
+              <span class="k">if</span> <span class="n">cost</span> <span class="o">&lt;</span> <span class="n">score</span> <span class="ow">and</span> <span class="n">cost</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">tracking</span><span class="p">[</span><span class="n">track</span><span class="p">]</span><span class="o">.</span><span class="n">conn_thres</span><span class="p">:</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="n">cost</span>
+                <span class="n">best_id_rgt</span> <span class="o">=</span> <span class="n">kid</span>
+
+            <span class="k">if</span> <span class="n">best_id_rgt</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            
+              <span class="c1"># triplet test</span>
+              <span class="n">jockey_tripdist</span> <span class="o">=</span> <span class="n">get_tripdist</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">],</span> <span class="n">triplet_features_jockeys</span><span class="p">,</span> <span class="n">jockey_cap_relation</span><span class="o">=</span><span class="n">jockey_cap_relation</span><span class="p">)</span>
+              <span class="n">cap_tripdist</span> <span class="o">=</span> <span class="n">get_tripdist</span><span class="p">(</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">][:,:</span><span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_lft</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">win</span><span class="o">+</span><span class="n">w</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][:,</span><span class="n">w</span><span class="p">:],</span> <span class="n">triplet_features_caps</span><span class="p">)</span>
+              <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span> <span class="o">=</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">ssid</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">subseq_ids_scores</span><span class="p">[</span><span class="n">best_id_rgt</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+              <span class="n">dif_num</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">id1</span> <span class="o">!=</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+              <span class="n">same_num</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">id1</span> <span class="o">==</span> <span class="n">id2</span> <span class="ow">and</span> <span class="n">id1</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">id2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">cap_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">same_num</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="n">cap_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">jockey_tripdist</span> <span class="o">&lt;</span> <span class="n">trip_thres</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">dif_num</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">][:,:</span><span class="n">subsequences</span><span class="p">[</span><span class="n">ssid</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">win</span><span class="o">+</span><span class="n">w</span><span class="p">],</span> <span class="n">subsequences</span><span class="p">[</span><span class="n">best_id_rgt</span><span class="p">][:,</span><span class="n">w</span><span class="p">:]],</span> <span class="mi">1</span><span class="p">)</span>                 
+              <span class="k">else</span><span class="p">:</span>               
+                <span class="n">best_id_rgt</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+          <span class="c1"># remove concatenated sequences</span>
+          <span class="n">minid</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">best_id_lft</span><span class="p">,</span> <span class="n">best_id_rgt</span><span class="p">)</span>
+          <span class="n">maxid</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">best_id_lft</span><span class="p">,</span> <span class="n">best_id_rgt</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">maxid</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">subsequences</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">maxid</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">minid</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">subsequences</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">minid</span><span class="p">)</span>
+
+          <span class="k">if</span> <span class="n">best_id_rgt</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">best_id_lft</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">ssid</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+      <span class="n">subsequences</span> <span class="o">=</span> <span class="n">sort_subsequences</span><span class="p">(</span><span class="n">subsequences</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">subsequences</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
