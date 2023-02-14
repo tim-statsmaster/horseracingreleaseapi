@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>util package &mdash; HorseRacing 2.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="main module" href="main.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            HorseRacing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">horseracingreleaseapi</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="detectron2-0.4.html">detectron2-0.4 package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">util package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util.FrameSaver">util.FrameSaver module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#util.FrameSaver.save_frame"><code class="docutils literal notranslate"><span class="pre">save_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util.database">util.database module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#util.database.HorseRacingDB"><code class="docutils literal notranslate"><span class="pre">HorseRacingDB</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util.image_util">util.image_util module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#util.image_util.decode_img"><code class="docutils literal notranslate"><span class="pre">decode_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.image_util.encode_img"><code class="docutils literal notranslate"><span class="pre">encode_img()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util.mask_util">util.mask_util module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#util.mask_util.decode_masks"><code class="docutils literal notranslate"><span class="pre">decode_masks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.mask_util.encode_masks"><code class="docutils literal notranslate"><span class="pre">encode_masks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.mask_util.get_masks_for_homograhy"><code class="docutils literal notranslate"><span class="pre">get_masks_for_homograhy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.mask_util.get_rail_masks"><code class="docutils literal notranslate"><span class="pre">get_rail_masks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.mask_util.get_rail_pole_masks"><code class="docutils literal notranslate"><span class="pre">get_rail_pole_masks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.mask_util.to_mask"><code class="docutils literal notranslate"><span class="pre">to_mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util.result">util.result module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#util.result.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.result.create_dir"><code class="docutils literal notranslate"><span class="pre">create_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.result.get_data_from_database"><code class="docutils literal notranslate"><span class="pre">get_data_from_database()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.result.get_directories"><code class="docutils literal notranslate"><span class="pre">get_directories()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.result.import_subsequences_results"><code class="docutils literal notranslate"><span class="pre">import_subsequences_results()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util.video_util">util.video_util module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#util.video_util.find_fps"><code class="docutils literal notranslate"><span class="pre">find_fps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#util.video_util.load_vid"><code class="docutils literal notranslate"><span class="pre">load_vid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-util">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HorseRacing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">horseracingreleaseapi</a></li>
+      <li class="breadcrumb-item active">util package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/util.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="util-package">
+<h1>util package<a class="headerlink" href="#util-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-util.FrameSaver">
+<span id="util-framesaver-module"></span><h2>util.FrameSaver module<a class="headerlink" href="#module-util.FrameSaver" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="util.FrameSaver.save_frame">
+<span class="sig-prename descclassname"><span class="pre">util.FrameSaver.</span></span><span class="sig-name descname"><span class="pre">save_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horseracingResult</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/FrameSaver.html#save_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.FrameSaver.save_frame" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-util.database">
+<span id="util-database-module"></span><h2>util.database module<a class="headerlink" href="#module-util.database" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="util.database.HorseRacingDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">util.database.</span></span><span class="sig-name descname"><span class="pre">HorseRacingDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'host':</span> <span class="pre">'3.114.25.239',</span> <span class="pre">'password':</span> <span class="pre">'YPXvz6vrsKQ8TNNa',</span> <span class="pre">'port':</span> <span class="pre">27017,</span> <span class="pre">'username':</span> <span class="pre">'root'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/database.html#HorseRacingDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.database.HorseRacingDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-util.image_util">
+<span id="util-image-util-module"></span><h2>util.image_util module<a class="headerlink" href="#module-util.image_util" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="util.image_util.decode_img">
+<span class="sig-prename descclassname"><span class="pre">util.image_util.</span></span><span class="sig-name descname"><span class="pre">decode_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/image_util.html#decode_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.image_util.decode_img" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.image_util.encode_img">
+<span class="sig-prename descclassname"><span class="pre">util.image_util.</span></span><span class="sig-name descname"><span class="pre">encode_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/image_util.html#encode_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.image_util.encode_img" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-util.mask_util">
+<span id="util-mask-util-module"></span><h2>util.mask_util module<a class="headerlink" href="#module-util.mask_util" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="util.mask_util.decode_masks">
+<span class="sig-prename descclassname"><span class="pre">util.mask_util.</span></span><span class="sig-name descname"><span class="pre">decode_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_masks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/mask_util.html#decode_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.mask_util.decode_masks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.mask_util.encode_masks">
+<span class="sig-prename descclassname"><span class="pre">util.mask_util.</span></span><span class="sig-name descname"><span class="pre">encode_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">masks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/mask_util.html#encode_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.mask_util.encode_masks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.mask_util.get_masks_for_homograhy">
+<span class="sig-prename descclassname"><span class="pre">util.mask_util.</span></span><span class="sig-name descname"><span class="pre">get_masks_for_homograhy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rail_mask_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rail_pole_mask_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantic_mask_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/mask_util.html#get_masks_for_homograhy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.mask_util.get_masks_for_homograhy" title="Permalink to this definition"></a></dt>
+<dd><p>Read the rail masks and the segmentation masks into memory and assemble them into a single mask per frame for optical flow estimation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.mask_util.get_rail_masks">
+<span class="sig-prename descclassname"><span class="pre">util.mask_util.</span></span><span class="sig-name descname"><span class="pre">get_rail_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finish_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/mask_util.html#get_rail_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.mask_util.get_rail_masks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.mask_util.get_rail_pole_masks">
+<span class="sig-prename descclassname"><span class="pre">util.mask_util.</span></span><span class="sig-name descname"><span class="pre">get_rail_pole_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finish_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/mask_util.html#get_rail_pole_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.mask_util.get_rail_pole_masks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.mask_util.to_mask">
+<span class="sig-prename descclassname"><span class="pre">util.mask_util.</span></span><span class="sig-name descname"><span class="pre">to_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_bbox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/mask_util.html#to_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.mask_util.to_mask" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-util.result">
+<span id="util-result-module"></span><h2>util.result module<a class="headerlink" href="#module-util.result" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="util.result.Result">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">util.result.</span></span><span class="sig-name descname"><span class="pre">Result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vid_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="util.result.Result.convert_to_excel">
+<span class="sig-name descname"><span class="pre">convert_to_excel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result.convert_to_excel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result.convert_to_excel" title="Permalink to this definition"></a></dt>
+<dd><p>convert the result to excel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="util.result.Result.get_fps">
+<span class="sig-name descname"><span class="pre">get_fps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result.get_fps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result.get_fps" title="Permalink to this definition"></a></dt>
+<dd><p>get the fps of the video</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vid_name</strong> (<em>string</em>) – video name (with out extension)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fps</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="util.result.Result.get_scene_classification_results_from_cache">
+<span class="sig-name descname"><span class="pre">get_scene_classification_results_from_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result.get_scene_classification_results_from_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result.get_scene_classification_results_from_cache" title="Permalink to this definition"></a></dt>
+<dd><p>create the csv file for storing start-end frame and camera changes if not exist. If exist, load data into memory</p>
+<section id="paramters">
+<h3>Paramters:<a class="headerlink" href="#paramters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>result_dir<span class="classifier">string</span></dt><dd><p>the directory of the output</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="util.result.Result.load_frames">
+<span class="sig-name descname"><span class="pre">load_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result.load_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result.load_frames" title="Permalink to this definition"></a></dt>
+<dd><p>load video frames, call load_vid from util.video_util</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vid_name</strong> (<em>string</em>) – video name (with out extension)</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – the starting frame of the frame set for loading</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – the ending frame of the frame set for loading</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="util.result.Result.make_result_dir">
+<span class="sig-name descname"><span class="pre">make_result_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result.make_result_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result.make_result_dir" title="Permalink to this definition"></a></dt>
+<dd><p>create directories for the result</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="util.result.Result.select_vid_names">
+<span class="sig-name descname"><span class="pre">select_vid_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vid_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#Result.select_vid_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.Result.select_vid_names" title="Permalink to this definition"></a></dt>
+<dd><p>For a particular task, find the set of videos that need processing, exclude the videos that does not need to process</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.result.create_dir">
+<span class="sig-prename descclassname"><span class="pre">util.result.</span></span><span class="sig-name descname"><span class="pre">create_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#create_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.create_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.result.get_data_from_database">
+<span class="sig-prename descclassname"><span class="pre">util.result.</span></span><span class="sig-name descname"><span class="pre">get_data_from_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#get_data_from_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.get_data_from_database" title="Permalink to this definition"></a></dt>
+<dd><p>connect to the mongoDB to obtain the jockeys and race info such as course, distance and track</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vid_names</strong> (<em>string</em>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>jockeys</strong> (<em>dict</em>) – key : Video name
+item: A list of jockey numbers for the jockeys that took part in the race and successfully finish</p></li>
+<li><p><strong>race_info</strong> (<em>dict</em>) – key : Video name
+item: a dictionary {‘track’: track, ‘distance’: distance, ‘course’: course}</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.result.get_directories">
+<span class="sig-prename descclassname"><span class="pre">util.result.</span></span><span class="sig-name descname"><span class="pre">get_directories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#get_directories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.get_directories" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.result.import_subsequences_results">
+<span class="sig-prename descclassname"><span class="pre">util.result.</span></span><span class="sig-name descname"><span class="pre">import_subsequences_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/result.html#import_subsequences_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.result.import_subsequences_results" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-util.video_util">
+<span id="util-video-util-module"></span><h2>util.video_util module<a class="headerlink" href="#module-util.video_util" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="util.video_util.find_fps">
+<span class="sig-prename descclassname"><span class="pre">util.video_util.</span></span><span class="sig-name descname"><span class="pre">find_fps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/video_util.html#find_fps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.video_util.find_fps" title="Permalink to this definition"></a></dt>
+<dd><p>get the actual fps. The actual fps == the default fps/frame_step. Please read the doc in load_vid() to understand the frame_step parameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vid_path</strong> (<em>string</em>) – path to the video file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fps</strong> – the actual fps of the frame set</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="util.video_util.load_vid">
+<span class="sig-prename descclassname"><span class="pre">util.video_util.</span></span><span class="sig-name descname"><span class="pre">load_vid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/util/video_util.html#load_vid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#util.video_util.load_vid" title="Permalink to this definition"></a></dt>
+<dd><p>load video into memory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vid_path</strong> (<em>string</em>) – the video name</p></li>
+<li><p><strong>start_frame</strong> (<em>int</em>) – the starting frame</p></li>
+<li><p><strong>end_frame</strong> (<em>int</em>) – the ending frame</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-util">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-util" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="main.html" class="btn btn-neutral float-left" title="main module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Statsmaster Ltd..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
