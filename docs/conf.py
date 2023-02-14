@@ -26,7 +26,7 @@ release = '2.4.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-	'sphinxcontrib.apidoc'
+	'sphinxcontrib.apidoc',
 	'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon'
