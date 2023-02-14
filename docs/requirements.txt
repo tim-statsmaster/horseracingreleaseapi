@@ -1,0 +1,3 @@
+torch
+sphinx-rtd-theme
+sphinxcontrib-apidoc
