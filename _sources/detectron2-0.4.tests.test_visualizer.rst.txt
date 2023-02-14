@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_visualizer module
+=============================================
+
+.. automodule:: detectron2-0.4.tests.test_visualizer
+   :members:
+   :undoc-members:
+   :show-inheritance:

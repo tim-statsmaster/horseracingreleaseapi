@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.checkpoint.detection\_checkpoint module
+==================================================================
+
+.. automodule:: detectron2-0.4.detectron2.checkpoint.detection_checkpoint
+   :members:
+   :undoc-members:
+   :show-inheritance:

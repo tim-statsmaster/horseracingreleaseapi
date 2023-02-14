@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_model\_analysis module
+==================================================
+
+.. automodule:: detectron2-0.4.tests.test_model_analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:

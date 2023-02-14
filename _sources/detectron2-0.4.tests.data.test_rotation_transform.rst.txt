@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.data.test\_rotation\_transform module
+===========================================================
+
+.. automodule:: detectron2-0.4.tests.data.test_rotation_transform
+   :members:
+   :undoc-members:
+   :show-inheritance:

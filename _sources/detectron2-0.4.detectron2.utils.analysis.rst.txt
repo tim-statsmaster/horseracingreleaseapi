@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.analysis module
+================================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:

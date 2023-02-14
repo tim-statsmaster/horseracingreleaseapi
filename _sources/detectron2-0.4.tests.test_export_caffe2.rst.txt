@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_export\_caffe2 module
+=================================================
+
+.. automodule:: detectron2-0.4.tests.test_export_caffe2
+   :members:
+   :undoc-members:
+   :show-inheritance:

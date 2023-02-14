@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.export.caffe2\_inference module
+==========================================================
+
+.. automodule:: detectron2-0.4.detectron2.export.caffe2_inference
+   :members:
+   :undoc-members:
+   :show-inheritance:

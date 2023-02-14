@@ -1,0 +1,25 @@
+detectron2\-0.4.tests.modeling package
+======================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.tests.modeling.test_anchor_generator
+   detectron2-0.4.tests.modeling.test_backbone
+   detectron2-0.4.tests.modeling.test_box2box_transform
+   detectron2-0.4.tests.modeling.test_fast_rcnn
+   detectron2-0.4.tests.modeling.test_matcher
+   detectron2-0.4.tests.modeling.test_model_e2e
+   detectron2-0.4.tests.modeling.test_roi_heads
+   detectron2-0.4.tests.modeling.test_roi_pooler
+   detectron2-0.4.tests.modeling.test_rpn
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.tests.modeling
+   :members:
+   :undoc-members:
+   :show-inheritance:

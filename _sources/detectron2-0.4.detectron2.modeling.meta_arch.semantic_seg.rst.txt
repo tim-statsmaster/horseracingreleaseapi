@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.meta\_arch.semantic\_seg module
+===================================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.meta_arch.semantic_seg
+   :members:
+   :undoc-members:
+   :show-inheritance:

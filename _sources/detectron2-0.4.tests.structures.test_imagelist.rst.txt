@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.structures.test\_imagelist module
+=======================================================
+
+.. automodule:: detectron2-0.4.tests.structures.test_imagelist
+   :members:
+   :undoc-members:
+   :show-inheritance:

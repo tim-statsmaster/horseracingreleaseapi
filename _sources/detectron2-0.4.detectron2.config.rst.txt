@@ -1,0 +1,20 @@
+detectron2\-0.4.detectron2.config package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.config.compat
+   detectron2-0.4.detectron2.config.config
+   detectron2-0.4.detectron2.config.defaults
+   detectron2-0.4.detectron2.config.instantiate
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.config
+   :members:
+   :undoc-members:
+   :show-inheritance:

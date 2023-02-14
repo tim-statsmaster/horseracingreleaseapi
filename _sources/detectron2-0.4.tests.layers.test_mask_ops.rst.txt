@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.layers.test\_mask\_ops module
+===================================================
+
+.. automodule:: detectron2-0.4.tests.layers.test_mask_ops
+   :members:
+   :undoc-members:
+   :show-inheritance:

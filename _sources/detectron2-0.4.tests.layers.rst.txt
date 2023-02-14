@@ -1,0 +1,23 @@
+detectron2\-0.4.tests.layers package
+====================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.tests.layers.test_blocks
+   detectron2-0.4.tests.layers.test_deformable
+   detectron2-0.4.tests.layers.test_mask_ops
+   detectron2-0.4.tests.layers.test_nms
+   detectron2-0.4.tests.layers.test_nms_rotated
+   detectron2-0.4.tests.layers.test_roi_align
+   detectron2-0.4.tests.layers.test_roi_align_rotated
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.tests.layers
+   :members:
+   :undoc-members:
+   :show-inheritance:

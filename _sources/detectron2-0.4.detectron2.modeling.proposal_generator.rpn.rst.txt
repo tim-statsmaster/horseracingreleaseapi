@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.proposal\_generator.rpn module
+==================================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.proposal_generator.rpn
+   :members:
+   :undoc-members:
+   :show-inheritance:

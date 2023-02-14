@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.catalog module
+==============================================
+
+.. automodule:: detectron2-0.4.detectron2.data.catalog
+   :members:
+   :undoc-members:
+   :show-inheritance:

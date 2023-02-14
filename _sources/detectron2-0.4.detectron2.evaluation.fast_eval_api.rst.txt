@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.evaluation.fast\_eval\_api module
+============================================================
+
+.. automodule:: detectron2-0.4.detectron2.evaluation.fast_eval_api
+   :members:
+   :undoc-members:
+   :show-inheritance:

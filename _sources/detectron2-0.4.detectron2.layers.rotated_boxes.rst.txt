@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.rotated\_boxes module
+=======================================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.rotated_boxes
+   :members:
+   :undoc-members:
+   :show-inheritance:

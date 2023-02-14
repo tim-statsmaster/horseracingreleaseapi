@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.backbone.fpn module
+=======================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.backbone.fpn
+   :members:
+   :undoc-members:
+   :show-inheritance:

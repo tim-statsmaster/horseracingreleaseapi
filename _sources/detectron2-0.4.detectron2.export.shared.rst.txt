@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.export.shared module
+===============================================
+
+.. automodule:: detectron2-0.4.detectron2.export.shared
+   :members:
+   :undoc-members:
+   :show-inheritance:

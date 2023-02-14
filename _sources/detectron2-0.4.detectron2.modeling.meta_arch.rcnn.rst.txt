@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.meta\_arch.rcnn module
+==========================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.meta_arch.rcnn
+   :members:
+   :undoc-members:
+   :show-inheritance:

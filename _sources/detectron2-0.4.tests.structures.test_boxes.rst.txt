@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.structures.test\_boxes module
+===================================================
+
+.. automodule:: detectron2-0.4.tests.structures.test_boxes
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.shape\_spec module
+====================================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.shape_spec
+   :members:
+   :undoc-members:
+   :show-inheritance:

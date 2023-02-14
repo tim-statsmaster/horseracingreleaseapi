@@ -1,0 +1,19 @@
+detectron2\-0.4.detectron2.checkpoint package
+=============================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.checkpoint.c2_model_loading
+   detectron2-0.4.detectron2.checkpoint.catalog
+   detectron2-0.4.detectron2.checkpoint.detection_checkpoint
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.checkpoint
+   :members:
+   :undoc-members:
+   :show-inheritance:

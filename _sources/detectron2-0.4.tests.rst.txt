@@ -1,0 +1,38 @@
+detectron2\-0.4.tests package
+=============================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   detectron2-0.4.tests.data
+   detectron2-0.4.tests.layers
+   detectron2-0.4.tests.modeling
+   detectron2-0.4.tests.structures
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.tests.test_checkpoint
+   detectron2-0.4.tests.test_config
+   detectron2-0.4.tests.test_engine
+   detectron2-0.4.tests.test_events
+   detectron2-0.4.tests.test_export_caffe2
+   detectron2-0.4.tests.test_export_torchscript
+   detectron2-0.4.tests.test_model_analysis
+   detectron2-0.4.tests.test_model_zoo
+   detectron2-0.4.tests.test_packaging
+   detectron2-0.4.tests.test_registry
+   detectron2-0.4.tests.test_scheduler
+   detectron2-0.4.tests.test_visualizer
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.tests
+   :members:
+   :undoc-members:
+   :show-inheritance:

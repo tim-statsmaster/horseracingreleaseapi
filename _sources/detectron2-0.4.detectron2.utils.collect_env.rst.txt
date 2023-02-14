@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.collect\_env module
+====================================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.collect_env
+   :members:
+   :undoc-members:
+   :show-inheritance:

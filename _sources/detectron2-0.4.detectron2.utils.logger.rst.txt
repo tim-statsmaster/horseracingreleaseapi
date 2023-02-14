@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.logger module
+==============================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:

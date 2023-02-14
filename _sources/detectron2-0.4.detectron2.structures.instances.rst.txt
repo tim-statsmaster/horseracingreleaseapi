@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.structures.instances module
+======================================================
+
+.. automodule:: detectron2-0.4.detectron2.structures.instances
+   :members:
+   :undoc-members:
+   :show-inheritance:

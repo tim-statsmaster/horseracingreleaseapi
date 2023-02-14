@@ -1,0 +1,26 @@
+detectron2\-0.4.detectron2.evaluation package
+=============================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.evaluation.cityscapes_evaluation
+   detectron2-0.4.detectron2.evaluation.coco_evaluation
+   detectron2-0.4.detectron2.evaluation.evaluator
+   detectron2-0.4.detectron2.evaluation.fast_eval_api
+   detectron2-0.4.detectron2.evaluation.lvis_evaluation
+   detectron2-0.4.detectron2.evaluation.panoptic_evaluation
+   detectron2-0.4.detectron2.evaluation.pascal_voc_evaluation
+   detectron2-0.4.detectron2.evaluation.rotated_coco_evaluation
+   detectron2-0.4.detectron2.evaluation.sem_seg_evaluation
+   detectron2-0.4.detectron2.evaluation.testing
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:

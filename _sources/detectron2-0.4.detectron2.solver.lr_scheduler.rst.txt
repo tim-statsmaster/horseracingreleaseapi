@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.solver.lr\_scheduler module
+======================================================
+
+.. automodule:: detectron2-0.4.detectron2.solver.lr_scheduler
+   :members:
+   :undoc-members:
+   :show-inheritance:

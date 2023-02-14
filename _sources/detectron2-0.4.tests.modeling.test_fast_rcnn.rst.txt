@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_fast\_rcnn module
+======================================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_fast_rcnn
+   :members:
+   :undoc-members:
+   :show-inheritance:

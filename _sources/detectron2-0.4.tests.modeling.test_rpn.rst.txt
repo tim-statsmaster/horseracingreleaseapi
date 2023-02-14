@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_rpn module
+===============================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_rpn
+   :members:
+   :undoc-members:
+   :show-inheritance:

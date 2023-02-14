@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.layers.test\_nms module
+=============================================
+
+.. automodule:: detectron2-0.4.tests.layers.test_nms
+   :members:
+   :undoc-members:
+   :show-inheritance:

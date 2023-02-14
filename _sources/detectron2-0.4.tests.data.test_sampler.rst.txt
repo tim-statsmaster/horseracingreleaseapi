@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.data.test\_sampler module
+===============================================
+
+.. automodule:: detectron2-0.4.tests.data.test_sampler
+   :members:
+   :undoc-members:
+   :show-inheritance:

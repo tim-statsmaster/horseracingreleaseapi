@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_model\_e2e module
+======================================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_model_e2e
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.video\_visualizer module
+=========================================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.video_visualizer
+   :members:
+   :undoc-members:
+   :show-inheritance:

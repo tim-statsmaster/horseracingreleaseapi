@@ -1,0 +1,22 @@
+detectron2\-0.4.detectron2.structures package
+=============================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.structures.boxes
+   detectron2-0.4.detectron2.structures.image_list
+   detectron2-0.4.detectron2.structures.instances
+   detectron2-0.4.detectron2.structures.keypoints
+   detectron2-0.4.detectron2.structures.masks
+   detectron2-0.4.detectron2.structures.rotated_boxes
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.structures
+   :members:
+   :undoc-members:
+   :show-inheritance:

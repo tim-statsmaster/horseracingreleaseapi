@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.serialize module
+=================================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.serialize
+   :members:
+   :undoc-members:
+   :show-inheritance:

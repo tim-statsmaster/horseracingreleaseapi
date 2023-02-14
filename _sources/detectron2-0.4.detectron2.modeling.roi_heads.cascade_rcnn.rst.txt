@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.roi\_heads.cascade\_rcnn module
+===================================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.roi_heads.cascade_rcnn
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.config.defaults module
+=================================================
+
+.. automodule:: detectron2-0.4.detectron2.config.defaults
+   :members:
+   :undoc-members:
+   :show-inheritance:

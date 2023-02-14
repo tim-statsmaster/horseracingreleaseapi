@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.batch\_norm module
+====================================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.batch_norm
+   :members:
+   :undoc-members:
+   :show-inheritance:

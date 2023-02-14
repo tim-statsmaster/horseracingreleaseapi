@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.solver.build module
+==============================================
+
+.. automodule:: detectron2-0.4.detectron2.solver.build
+   :members:
+   :undoc-members:
+   :show-inheritance:

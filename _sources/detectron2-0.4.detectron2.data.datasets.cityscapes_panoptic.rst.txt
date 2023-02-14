@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.datasets.cityscapes\_panoptic module
+====================================================================
+
+.. automodule:: detectron2-0.4.detectron2.data.datasets.cityscapes_panoptic
+   :members:
+   :undoc-members:
+   :show-inheritance:

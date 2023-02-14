@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_roi\_heads module
+======================================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_roi_heads
+   :members:
+   :undoc-members:
+   :show-inheritance:

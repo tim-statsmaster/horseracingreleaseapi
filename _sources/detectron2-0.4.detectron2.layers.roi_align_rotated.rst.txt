@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.roi\_align\_rotated module
+============================================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.roi_align_rotated
+   :members:
+   :undoc-members:
+   :show-inheritance:

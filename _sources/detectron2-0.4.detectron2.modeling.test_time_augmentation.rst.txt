@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.test\_time\_augmentation module
+===================================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.test_time_augmentation
+   :members:
+   :undoc-members:
+   :show-inheritance:

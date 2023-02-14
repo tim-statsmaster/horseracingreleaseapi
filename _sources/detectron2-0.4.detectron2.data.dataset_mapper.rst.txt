@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.dataset\_mapper module
+======================================================
+
+.. automodule:: detectron2-0.4.detectron2.data.dataset_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.datasets.builtin\_meta module
+=============================================================
+
+.. automodule:: detectron2-0.4.detectron2.data.datasets.builtin_meta
+   :members:
+   :undoc-members:
+   :show-inheritance:

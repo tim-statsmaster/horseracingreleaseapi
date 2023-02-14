@@ -1,0 +1,27 @@
+detectron2\-0.4.detectron2.layers package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.layers.aspp
+   detectron2-0.4.detectron2.layers.batch_norm
+   detectron2-0.4.detectron2.layers.blocks
+   detectron2-0.4.detectron2.layers.deform_conv
+   detectron2-0.4.detectron2.layers.mask_ops
+   detectron2-0.4.detectron2.layers.nms
+   detectron2-0.4.detectron2.layers.roi_align
+   detectron2-0.4.detectron2.layers.roi_align_rotated
+   detectron2-0.4.detectron2.layers.rotated_boxes
+   detectron2-0.4.detectron2.layers.shape_spec
+   detectron2-0.4.detectron2.layers.wrappers
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.layers
+   :members:
+   :undoc-members:
+   :show-inheritance:

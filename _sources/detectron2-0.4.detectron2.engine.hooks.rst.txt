@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.engine.hooks module
+==============================================
+
+.. automodule:: detectron2-0.4.detectron2.engine.hooks
+   :members:
+   :undoc-members:
+   :show-inheritance:

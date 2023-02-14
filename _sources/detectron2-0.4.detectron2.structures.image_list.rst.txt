@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.structures.image\_list module
+========================================================
+
+.. automodule:: detectron2-0.4.detectron2.structures.image_list
+   :members:
+   :undoc-members:
+   :show-inheritance:

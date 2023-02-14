@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_checkpoint module
+=============================================
+
+.. automodule:: detectron2-0.4.tests.test_checkpoint
+   :members:
+   :undoc-members:
+   :show-inheritance:

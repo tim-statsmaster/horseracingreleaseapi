@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.layers.test\_deformable module
+====================================================
+
+.. automodule:: detectron2-0.4.tests.layers.test_deformable
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.evaluation.panoptic\_evaluation module
+=================================================================
+
+.. automodule:: detectron2-0.4.detectron2.evaluation.panoptic_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:

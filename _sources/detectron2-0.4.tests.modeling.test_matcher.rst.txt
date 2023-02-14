@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_matcher module
+===================================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_matcher
+   :members:
+   :undoc-members:
+   :show-inheritance:

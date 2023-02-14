@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.memory module
+==============================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.memory
+   :members:
+   :undoc-members:
+   :show-inheritance:

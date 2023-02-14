@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.transforms.augmentation\_impl module
+====================================================================
+
+.. automodule:: detectron2-0.4.detectron2.data.transforms.augmentation_impl
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.datasets.lvis module
+====================================================
+
+.. automodule:: detectron2-0.4.detectron2.data.datasets.lvis
+   :members:
+   :undoc-members:
+   :show-inheritance:

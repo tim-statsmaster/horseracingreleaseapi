@@ -1,0 +1,18 @@
+detectron2\-0.4.detectron2.solver package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.solver.build
+   detectron2-0.4.detectron2.solver.lr_scheduler
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.solver
+   :members:
+   :undoc-members:
+   :show-inheritance:

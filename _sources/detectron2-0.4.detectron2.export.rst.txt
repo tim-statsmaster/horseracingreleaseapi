@@ -1,0 +1,26 @@
+detectron2\-0.4.detectron2.export package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.export.api
+   detectron2-0.4.detectron2.export.c10
+   detectron2-0.4.detectron2.export.caffe2_export
+   detectron2-0.4.detectron2.export.caffe2_inference
+   detectron2-0.4.detectron2.export.caffe2_modeling
+   detectron2-0.4.detectron2.export.caffe2_patch
+   detectron2-0.4.detectron2.export.flatten
+   detectron2-0.4.detectron2.export.shared
+   detectron2-0.4.detectron2.export.torchscript
+   detectron2-0.4.detectron2.export.torchscript_patch
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.export
+   :members:
+   :undoc-members:
+   :show-inheritance:

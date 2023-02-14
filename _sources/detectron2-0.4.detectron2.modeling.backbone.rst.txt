@@ -1,0 +1,20 @@
+detectron2\-0.4.detectron2.modeling.backbone package
+====================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.modeling.backbone.backbone
+   detectron2-0.4.detectron2.modeling.backbone.build
+   detectron2-0.4.detectron2.modeling.backbone.fpn
+   detectron2-0.4.detectron2.modeling.backbone.resnet
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.modeling.backbone
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.data.test\_transforms module
+==================================================
+
+.. automodule:: detectron2-0.4.tests.data.test_transforms
+   :members:
+   :undoc-members:
+   :show-inheritance:

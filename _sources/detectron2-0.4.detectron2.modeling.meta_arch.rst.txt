@@ -1,0 +1,21 @@
+detectron2\-0.4.detectron2.modeling.meta\_arch package
+======================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.modeling.meta_arch.build
+   detectron2-0.4.detectron2.modeling.meta_arch.panoptic_fpn
+   detectron2-0.4.detectron2.modeling.meta_arch.rcnn
+   detectron2-0.4.detectron2.modeling.meta_arch.retinanet
+   detectron2-0.4.detectron2.modeling.meta_arch.semantic_seg
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.modeling.meta_arch
+   :members:
+   :undoc-members:
+   :show-inheritance:

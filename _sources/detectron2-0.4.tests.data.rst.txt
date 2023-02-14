@@ -1,0 +1,22 @@
+detectron2\-0.4.tests.data package
+==================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.tests.data.test_coco
+   detectron2-0.4.tests.data.test_coco_evaluation
+   detectron2-0.4.tests.data.test_detection_utils
+   detectron2-0.4.tests.data.test_rotation_transform
+   detectron2-0.4.tests.data.test_sampler
+   detectron2-0.4.tests.data.test_transforms
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.tests.data
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,21 @@
+detectron2\-0.4.tests.structures package
+========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.tests.structures.test_boxes
+   detectron2-0.4.tests.structures.test_imagelist
+   detectron2-0.4.tests.structures.test_instances
+   detectron2-0.4.tests.structures.test_masks
+   detectron2-0.4.tests.structures.test_rotated_boxes
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.tests.structures
+   :members:
+   :undoc-members:
+   :show-inheritance:

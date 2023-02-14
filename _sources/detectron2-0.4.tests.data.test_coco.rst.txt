@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.data.test\_coco module
+============================================
+
+.. automodule:: detectron2-0.4.tests.data.test_coco
+   :members:
+   :undoc-members:
+   :show-inheritance:

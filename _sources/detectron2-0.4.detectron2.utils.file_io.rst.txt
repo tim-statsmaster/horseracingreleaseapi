@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.file\_io module
+================================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.file_io
+   :members:
+   :undoc-members:
+   :show-inheritance:

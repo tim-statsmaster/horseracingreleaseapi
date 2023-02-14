@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.aspp module
+=============================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.aspp
+   :members:
+   :undoc-members:
+   :show-inheritance:

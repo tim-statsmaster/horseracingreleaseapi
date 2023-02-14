@@ -1,0 +1,20 @@
+detectron2\-0.4.detectron2.engine package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.engine.defaults
+   detectron2-0.4.detectron2.engine.hooks
+   detectron2-0.4.detectron2.engine.launch
+   detectron2-0.4.detectron2.engine.train_loop
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.engine
+   :members:
+   :undoc-members:
+   :show-inheritance:

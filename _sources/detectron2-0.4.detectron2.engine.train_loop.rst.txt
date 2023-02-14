@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.engine.train\_loop module
+====================================================
+
+.. automodule:: detectron2-0.4.detectron2.engine.train_loop
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.evaluation.evaluator module
+======================================================
+
+.. automodule:: detectron2-0.4.detectron2.evaluation.evaluator
+   :members:
+   :undoc-members:
+   :show-inheritance:

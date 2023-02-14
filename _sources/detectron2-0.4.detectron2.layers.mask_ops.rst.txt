@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.mask\_ops module
+==================================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.mask_ops
+   :members:
+   :undoc-members:
+   :show-inheritance:

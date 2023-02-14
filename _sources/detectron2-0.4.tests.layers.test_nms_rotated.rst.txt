@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.layers.test\_nms\_rotated module
+======================================================
+
+.. automodule:: detectron2-0.4.tests.layers.test_nms_rotated
+   :members:
+   :undoc-members:
+   :show-inheritance:

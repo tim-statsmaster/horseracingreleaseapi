@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.data.datasets.pascal\_voc module
+===========================================================
+
+.. automodule:: detectron2-0.4.detectron2.data.datasets.pascal_voc
+   :members:
+   :undoc-members:
+   :show-inheritance:

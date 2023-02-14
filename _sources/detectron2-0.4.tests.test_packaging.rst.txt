@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_packaging module
+============================================
+
+.. automodule:: detectron2-0.4.tests.test_packaging
+   :members:
+   :undoc-members:
+   :show-inheritance:

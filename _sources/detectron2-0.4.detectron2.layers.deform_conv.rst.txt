@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.layers.deform\_conv module
+=====================================================
+
+.. automodule:: detectron2-0.4.detectron2.layers.deform_conv
+   :members:
+   :undoc-members:
+   :show-inheritance:

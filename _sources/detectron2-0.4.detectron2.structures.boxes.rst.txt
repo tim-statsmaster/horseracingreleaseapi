@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.structures.boxes module
+==================================================
+
+.. automodule:: detectron2-0.4.detectron2.structures.boxes
+   :members:
+   :undoc-members:
+   :show-inheritance:

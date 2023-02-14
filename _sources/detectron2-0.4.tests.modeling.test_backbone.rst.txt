@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_backbone module
+====================================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_backbone
+   :members:
+   :undoc-members:
+   :show-inheritance:

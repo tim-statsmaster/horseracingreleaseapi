@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_registry module
+===========================================
+
+.. automodule:: detectron2-0.4.tests.test_registry
+   :members:
+   :undoc-members:
+   :show-inheritance:

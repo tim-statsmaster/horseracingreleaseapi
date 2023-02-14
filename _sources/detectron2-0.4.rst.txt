@@ -1,0 +1,25 @@
+detectron2\-0.4 package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2
+   detectron2-0.4.tests
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.setup
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4
+   :members:
+   :undoc-members:
+   :show-inheritance:

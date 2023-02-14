@@ -1,0 +1,30 @@
+detectron2\-0.4.detectron2.utils package
+========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.utils.analysis
+   detectron2-0.4.detectron2.utils.collect_env
+   detectron2-0.4.detectron2.utils.colormap
+   detectron2-0.4.detectron2.utils.comm
+   detectron2-0.4.detectron2.utils.env
+   detectron2-0.4.detectron2.utils.events
+   detectron2-0.4.detectron2.utils.file_io
+   detectron2-0.4.detectron2.utils.logger
+   detectron2-0.4.detectron2.utils.memory
+   detectron2-0.4.detectron2.utils.registry
+   detectron2-0.4.detectron2.utils.serialize
+   detectron2-0.4.detectron2.utils.testing
+   detectron2-0.4.detectron2.utils.video_visualizer
+   detectron2-0.4.detectron2.utils.visualizer
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

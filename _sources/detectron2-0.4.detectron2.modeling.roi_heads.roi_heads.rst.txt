@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.roi\_heads.roi\_heads module
+================================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.roi_heads.roi_heads
+   :members:
+   :undoc-members:
+   :show-inheritance:

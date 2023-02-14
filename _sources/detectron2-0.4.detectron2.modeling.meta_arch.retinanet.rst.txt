@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.meta\_arch.retinanet module
+===============================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.meta_arch.retinanet
+   :members:
+   :undoc-members:
+   :show-inheritance:

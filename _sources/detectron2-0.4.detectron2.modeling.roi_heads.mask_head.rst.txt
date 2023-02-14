@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.roi\_heads.mask\_head module
+================================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.roi_heads.mask_head
+   :members:
+   :undoc-members:
+   :show-inheritance:

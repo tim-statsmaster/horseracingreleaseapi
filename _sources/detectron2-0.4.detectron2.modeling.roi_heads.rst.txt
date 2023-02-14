@@ -1,0 +1,23 @@
+detectron2\-0.4.detectron2.modeling.roi\_heads package
+======================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.modeling.roi_heads.box_head
+   detectron2-0.4.detectron2.modeling.roi_heads.cascade_rcnn
+   detectron2-0.4.detectron2.modeling.roi_heads.fast_rcnn
+   detectron2-0.4.detectron2.modeling.roi_heads.keypoint_head
+   detectron2-0.4.detectron2.modeling.roi_heads.mask_head
+   detectron2-0.4.detectron2.modeling.roi_heads.roi_heads
+   detectron2-0.4.detectron2.modeling.roi_heads.rotated_fast_rcnn
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.modeling.roi_heads
+   :members:
+   :undoc-members:
+   :show-inheritance:

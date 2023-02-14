@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.structures.test\_instances module
+=======================================================
+
+.. automodule:: detectron2-0.4.tests.structures.test_instances
+   :members:
+   :undoc-members:
+   :show-inheritance:

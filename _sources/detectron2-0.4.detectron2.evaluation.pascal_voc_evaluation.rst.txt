@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.evaluation.pascal\_voc\_evaluation module
+====================================================================
+
+.. automodule:: detectron2-0.4.detectron2.evaluation.pascal_voc_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:

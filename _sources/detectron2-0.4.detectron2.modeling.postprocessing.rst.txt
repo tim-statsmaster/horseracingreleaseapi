@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.postprocessing module
+=========================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.postprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:

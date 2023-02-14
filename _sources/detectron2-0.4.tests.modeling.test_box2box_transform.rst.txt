@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.modeling.test\_box2box\_transform module
+==============================================================
+
+.. automodule:: detectron2-0.4.tests.modeling.test_box2box_transform
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.export.torchscript module
+====================================================
+
+.. automodule:: detectron2-0.4.detectron2.export.torchscript
+   :members:
+   :undoc-members:
+   :show-inheritance:

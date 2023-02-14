@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.evaluation.lvis\_evaluation module
+=============================================================
+
+.. automodule:: detectron2-0.4.detectron2.evaluation.lvis_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:

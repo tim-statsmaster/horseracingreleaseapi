@@ -1,0 +1,10 @@
+detectron2\-0.4.detectron2.projects package
+===========================================
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.projects
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.utils.comm module
+============================================
+
+.. automodule:: detectron2-0.4.detectron2.utils.comm
+   :members:
+   :undoc-members:
+   :show-inheritance:

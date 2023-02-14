@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.backbone.resnet module
+==========================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.backbone.resnet
+   :members:
+   :undoc-members:
+   :show-inheritance:

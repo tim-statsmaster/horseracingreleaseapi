@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.structures.test\_masks module
+===================================================
+
+.. automodule:: detectron2-0.4.tests.structures.test_masks
+   :members:
+   :undoc-members:
+   :show-inheritance:

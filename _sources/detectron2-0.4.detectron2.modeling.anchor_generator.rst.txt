@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.anchor\_generator module
+============================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.anchor_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:

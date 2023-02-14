@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.test\_events module
+=========================================
+
+.. automodule:: detectron2-0.4.tests.test_events
+   :members:
+   :undoc-members:
+   :show-inheritance:

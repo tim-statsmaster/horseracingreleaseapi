@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.checkpoint.c2\_model\_loading module
+===============================================================
+
+.. automodule:: detectron2-0.4.detectron2.checkpoint.c2_model_loading
+   :members:
+   :undoc-members:
+   :show-inheritance:

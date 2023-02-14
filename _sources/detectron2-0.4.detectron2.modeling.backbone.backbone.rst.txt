@@ -1,0 +1,7 @@
+detectron2\-0.4.detectron2.modeling.backbone.backbone module
+============================================================
+
+.. automodule:: detectron2-0.4.detectron2.modeling.backbone.backbone
+   :members:
+   :undoc-members:
+   :show-inheritance:

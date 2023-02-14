@@ -1,0 +1,30 @@
+detectron2\-0.4.detectron2.data package
+=======================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.data.datasets
+   detectron2-0.4.detectron2.data.samplers
+   detectron2-0.4.detectron2.data.transforms
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.data.build
+   detectron2-0.4.detectron2.data.catalog
+   detectron2-0.4.detectron2.data.common
+   detectron2-0.4.detectron2.data.dataset_mapper
+   detectron2-0.4.detectron2.data.detection_utils
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.data
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+detectron2\-0.4.tests.data.test\_detection\_utils module
+========================================================
+
+.. automodule:: detectron2-0.4.tests.data.test_detection_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

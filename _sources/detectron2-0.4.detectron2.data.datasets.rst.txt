@@ -1,0 +1,27 @@
+detectron2\-0.4.detectron2.data.datasets package
+================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.data.datasets.builtin
+   detectron2-0.4.detectron2.data.datasets.builtin_meta
+   detectron2-0.4.detectron2.data.datasets.cityscapes
+   detectron2-0.4.detectron2.data.datasets.cityscapes_panoptic
+   detectron2-0.4.detectron2.data.datasets.coco
+   detectron2-0.4.detectron2.data.datasets.coco_panoptic
+   detectron2-0.4.detectron2.data.datasets.lvis
+   detectron2-0.4.detectron2.data.datasets.lvis_v0_5_categories
+   detectron2-0.4.detectron2.data.datasets.lvis_v1_categories
+   detectron2-0.4.detectron2.data.datasets.pascal_voc
+   detectron2-0.4.detectron2.data.datasets.register_coco
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.data.datasets
+   :members:
+   :undoc-members:
+   :show-inheritance:

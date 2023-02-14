@@ -1,0 +1,33 @@
+detectron2\-0.4.detectron2.modeling package
+===========================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.modeling.backbone
+   detectron2-0.4.detectron2.modeling.meta_arch
+   detectron2-0.4.detectron2.modeling.proposal_generator
+   detectron2-0.4.detectron2.modeling.roi_heads
+
+Submodules
+----------
+
+.. toctree::
+
+   detectron2-0.4.detectron2.modeling.anchor_generator
+   detectron2-0.4.detectron2.modeling.box_regression
+   detectron2-0.4.detectron2.modeling.matcher
+   detectron2-0.4.detectron2.modeling.poolers
+   detectron2-0.4.detectron2.modeling.postprocessing
+   detectron2-0.4.detectron2.modeling.sampling
+   detectron2-0.4.detectron2.modeling.test_time_augmentation
+
+Module contents
+---------------
+
+.. automodule:: detectron2-0.4.detectron2.modeling
+   :members:
+   :undoc-members:
+   :show-inheritance:
