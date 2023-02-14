@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.modeling.roi_heads.box_head
    detectron2-0.4.detectron2.modeling.roi_heads.cascade_rcnn

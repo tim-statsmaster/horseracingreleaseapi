@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.data.transforms.augmentation
    detectron2-0.4.detectron2.data.transforms.augmentation_impl

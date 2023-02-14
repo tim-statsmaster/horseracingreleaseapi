@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.checkpoint
    detectron2-0.4.detectron2.config

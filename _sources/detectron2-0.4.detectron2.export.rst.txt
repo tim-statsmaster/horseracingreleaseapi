@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.export.api
    detectron2-0.4.detectron2.export.c10

@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.checkpoint.c2_model_loading
    detectron2-0.4.detectron2.checkpoint.catalog

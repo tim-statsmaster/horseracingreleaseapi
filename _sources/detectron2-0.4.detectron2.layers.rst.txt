@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.layers.aspp
    detectron2-0.4.detectron2.layers.batch_norm

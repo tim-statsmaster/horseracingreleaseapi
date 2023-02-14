@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.data.samplers.distributed_sampler
    detectron2-0.4.detectron2.data.samplers.grouped_batch_sampler

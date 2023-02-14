@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.modeling.proposal_generator.build
    detectron2-0.4.detectron2.modeling.proposal_generator.proposal_utils

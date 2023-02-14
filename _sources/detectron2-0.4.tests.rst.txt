@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.tests.data
    detectron2-0.4.tests.layers
@@ -15,6 +16,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.tests.test_checkpoint
    detectron2-0.4.tests.test_config

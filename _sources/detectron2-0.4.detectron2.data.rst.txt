@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.data.datasets
    detectron2-0.4.detectron2.data.samplers
@@ -14,6 +15,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.detectron2.data.build
    detectron2-0.4.detectron2.data.catalog

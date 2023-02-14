@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    detectron2-0.4.tests.data.test_coco
    detectron2-0.4.tests.data.test_coco_evaluation
