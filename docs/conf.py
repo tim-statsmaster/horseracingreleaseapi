@@ -27,7 +27,6 @@ release = '2.4.0'
 
 extensions = [
 	'sphinxcontrib.apidoc'
-	'sphinx.ext.todo',
 	'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon'
