@@ -17,7 +17,7 @@ jobs:
         pip install --upgrade pip
         pip install sphinx sphinx-rtd-theme sphinxcontrib-apidoc
     # Standard drop-in approach that should work for most people.
-    - uses: ammaraskar/sphinx-action@master
+    - uses: tim-statsmaster/sphinx-action@master
       with:
         docs-folder: "docs/"
     # Publish built docs to gh-pages branch.
