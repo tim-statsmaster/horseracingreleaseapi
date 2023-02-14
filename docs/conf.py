@@ -11,8 +11,12 @@
 #
 import os
 import sys
+from pathlib import Path
 
-sys.path.append(os.path.abspath('..'))
+parent = Path(__file__).parent
+parents_parent = Path(__file__).parents[1]
+
+sys.path.insert(0, parent)
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
