@@ -32,10 +32,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon'
 ]
-extensions = [
-    'sphinxcontrib.apidoc',
-    # ...
-]
 apidoc_module_dir = '..'
 apidoc_output_dir = '.'
 apidoc_excluded_paths = ['_build', 'Thumbs.db', '.DS_Store']
